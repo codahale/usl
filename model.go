@@ -1,4 +1,4 @@
-package main
+package usl
 
 import (
 	"fmt"
@@ -7,19 +7,19 @@ import (
 	"code.google.com/p/gomatrix/matrix"
 )
 
-type model struct {
-	alpha, beta, y float64
-	nmax, nopt     int
+type Model struct {
+	Alpha, Beta, Y float64
+	Nmax, Nopt     int
 }
 
-func (m model) predict(n int) float64 {
+func (m Model) Predict(n int) float64 {
 	x := float64(n)
-	c := x / (1 + (m.alpha * (x - 1)) + (m.beta * x * (x - 1)))
-	return c * m.y
+	c := x / (1 + (m.Alpha * (x - 1)) + (m.Beta * x * (x - 1)))
+	return c * m.Y
 }
 
 // performs quadratic regression on the data points and returns a model
-func analyze(points map[int]float64) (m model, err error) {
+func Analyze(points map[int]float64) (m Model, err error) {
 	xs := make([]float64, 0, len(points))
 	ys := make([]float64, 0, len(points))
 
@@ -63,11 +63,11 @@ func analyze(points map[int]float64) (m model, err error) {
 		c[i] /= r.Get(i, i)
 	}
 
-	m.alpha = math.Abs(c[2] - c[1])
-	m.beta = math.Abs(c[2])
-	m.y = y1
-	m.nmax = int(math.Floor(math.Sqrt((1 - m.alpha) / m.beta)))
-	m.nopt = int(math.Ceil(1 / m.alpha))
+	m.Alpha = math.Abs(c[2] - c[1])
+	m.Beta = math.Abs(c[2])
+	m.Y = y1
+	m.Nmax = int(math.Floor(math.Sqrt((1 - m.Alpha) / m.Beta)))
+	m.Nopt = int(math.Ceil(1 / m.Alpha))
 
 	return
 }

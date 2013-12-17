@@ -17,6 +17,8 @@ import (
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/codahale/usl"
 )
 
 var (
@@ -37,16 +39,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	model, err := analyze(points)
+	model, err := usl.Analyze(points)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println("Model:")
-	log.Printf("\tα     = %f\n", model.alpha)
-	log.Printf("\tβ     = %f\n", model.alpha)
-	log.Printf("\tN max = %d\n", model.nmax)
-	log.Printf("\tN opt = %d\n", model.nopt)
+	log.Printf("\tα     = %f\n", model.Alpha)
+	log.Printf("\tβ     = %f\n", model.Beta)
+	log.Printf("\tN max = %d\n", model.Nmax)
+	log.Printf("\tN opt = %d\n", model.Nopt)
 	log.Println()
 
 	for _, s := range flag.Args() {
@@ -54,7 +56,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%d,%f\n", x, model.predict(x))
+		fmt.Printf("%d,%f\n", x, model.Predict(x))
 	}
 }
 
