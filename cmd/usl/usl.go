@@ -34,12 +34,12 @@ func main() {
 		log.Fatal("No input files provided.")
 	}
 
-	points, err := parse(*input)
+	measurements, err := parse(*input)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	model, err := usl.Analyze(points)
+	model, err := usl.Build(measurements)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,20 +48,19 @@ func main() {
 	log.Printf("\tα     = %f\n", model.Alpha)
 	log.Printf("\tβ     = %f\n", model.Beta)
 	log.Printf("\tN max = %d\n", model.Nmax)
-	log.Printf("\tN opt = %d\n", model.Nopt)
 	log.Println()
 
 	for _, s := range flag.Args() {
-		x, err := strconv.Atoi(s)
+		x, err := strconv.ParseFloat(s, 64)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%d,%f\n", x, model.Predict(x))
+		fmt.Printf("%f,%f\n", x, model.Predict(x))
 	}
 }
 
-func parse(filename string) (map[int]float64, error) {
-	points := make(map[int]float64)
+func parse(filename string) (usl.MeasurementSet, error) {
+	measurements := make(usl.MeasurementSet, 0)
 
 	f, err := os.Open(filename)
 	if err != nil {
@@ -80,7 +79,7 @@ func parse(filename string) (map[int]float64, error) {
 			return nil, fmt.Errorf("invalid line at line %d", i)
 		}
 
-		x, err := strconv.Atoi(line[0])
+		x, err := strconv.ParseFloat(line[0], 64)
 		if err != nil {
 			return nil, fmt.Errorf("%v at line %d, column 0", err, i)
 		}
@@ -90,8 +89,8 @@ func parse(filename string) (map[int]float64, error) {
 			return nil, fmt.Errorf("%v at line %d, column 1", err, i)
 		}
 
-		points[x] = y
+		measurements = append(measurements, usl.Measurement{X: x, Y: y})
 	}
 
-	return points, nil
+	return measurements, nil
 }

@@ -6,17 +6,17 @@ import (
 )
 
 func TestAnalyze(t *testing.T) {
-	points := map[int]float64{
-		1:   65,
-		18:  996,
-		36:  1652,
-		72:  1853,
-		108: 1829,
-		144: 1775,
-		216: 1702,
+	measurements := MeasurementSet{
+		Measurement{X: 1, Y: 65},
+		Measurement{X: 18, Y: 996},
+		Measurement{X: 36, Y: 1652},
+		Measurement{X: 72, Y: 1853},
+		Measurement{X: 108, Y: 1829},
+		Measurement{X: 144, Y: 1775},
+		Measurement{X: 216, Y: 1702},
 	}
 
-	m, err := Analyze(points)
+	m, err := Build(measurements)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,7 +37,9 @@ func TestAnalyze(t *testing.T) {
 		t.Errorf("Bad Nmax: %d", m.Nmax)
 	}
 
-	if m.Nopt != 50 {
-		t.Errorf("Bad Nopt: %d", m.Nopt)
+	expected := 1164.4929146148988
+	actual := m.Predict(500.0)
+	if math.Abs(expected-actual) > 0.00001 {
+		t.Errorf("Expected %v but was %v", expected, actual)
 	}
 }

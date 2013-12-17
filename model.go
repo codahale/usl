@@ -1,40 +1,76 @@
+// Package usl provides functional to build Universal Scalability Law models
+// from sets of observed measurements.
 package usl
 
 import (
-	"fmt"
+	"errors"
 	"math"
+	"sort"
 
 	"code.google.com/p/gomatrix/matrix"
 )
 
-type Model struct {
-	Alpha, Beta, Y float64
-	Nmax, Nopt     int
+var (
+	// ErrInsufficientMeasurements is returned when less than 6 measurements were
+	// provided.
+	ErrInsufficientMeasurements = errors.New("usl: need at least 6 measurements")
+)
+
+// Measurement is a simultaneous measurement of both an independent variable and
+// a dependent variable.
+type Measurement struct {
+	X float64 // X is a measurement of the independent variable.
+	Y float64 // Y is a simultaneous measurement of the dependent variable.
 }
 
-func (m Model) Predict(n int) float64 {
-	x := float64(n)
+// MeasurementSet is a sortable set of measurements.
+type MeasurementSet []Measurement
+
+func (m MeasurementSet) Len() int {
+	return len(m)
+}
+
+func (m MeasurementSet) Less(i, j int) bool {
+	return m[i].X < m[j].X
+}
+
+func (m MeasurementSet) Swap(i, j int) {
+	x := m[i]
+	m[i] = m[j]
+	m[j] = x
+}
+
+// Model is a Universal Scalability Law model.
+type Model struct {
+	Alpha float64 // Alpha represents the levels of contention.
+	Beta  float64 // Beta represents the coherency delay.
+	Y     float64 // Y is the system's unloaded behavior.
+	Nmax  int     // Nmax is the usage level at which capacity is maximized.
+}
+
+// Predict returns the predicted value at a given utilization level.
+func (m Model) Predict(x float64) float64 {
 	c := x / (1 + (m.Alpha * (x - 1)) + (m.Beta * x * (x - 1)))
 	return c * m.Y
 }
 
-// performs quadratic regression on the data points and returns a model
-func Analyze(points map[int]float64) (m Model, err error) {
-	xs := make([]float64, 0, len(points))
-	ys := make([]float64, 0, len(points))
-
-	y1, ok := points[1]
-	if !ok {
-		err = fmt.Errorf("No point for 1 user")
+// Build returns a model whose parameters are generated from the given
+// measurements.
+func Build(measurements MeasurementSet) (m Model, err error) {
+	if len(measurements) < 6 {
+		err = ErrInsufficientMeasurements
 		return
 	}
 
-	for n, y := range points {
-		x := float64(n)
-		linX := x - 1
-		linY := (x / (y / y1)) - 1
-		xs = append(xs, linX)
-		ys = append(ys, linY)
+	sort.Sort(measurements)
+	y0 := measurements[0].Y / measurements[0].X
+
+	xs := make([]float64, 0, len(measurements))
+	ys := make([]float64, 0, len(measurements))
+
+	for _, m := range measurements {
+		xs = append(xs, m.X-1)
+		ys = append(ys, (m.X/(m.Y/y0))-1)
 	}
 
 	var c [3]float64 // do quadratic regression
@@ -65,9 +101,8 @@ func Analyze(points map[int]float64) (m Model, err error) {
 
 	m.Alpha = math.Abs(c[2] - c[1])
 	m.Beta = math.Abs(c[2])
-	m.Y = y1
+	m.Y = y0
 	m.Nmax = int(math.Floor(math.Sqrt((1 - m.Alpha) / m.Beta)))
-	m.Nopt = int(math.Ceil(1 / m.Alpha))
 
 	return
 }
