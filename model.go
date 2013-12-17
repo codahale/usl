@@ -22,6 +22,7 @@ func (m model) predict(n int) float64 {
 	return c * m.y
 }
 
+// performs quadratic regression on the data points and returns a model
 func analyze(points map[int]float64) (m model, err error) {
 	xs := make([]float64, 0, len(points))
 	ys := make([]float64, 0, len(points))
