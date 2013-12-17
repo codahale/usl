@@ -87,19 +87,19 @@ func parseCSV(filename string) (usl.MeasurementSet, error) {
 
 func parseLine(i int, line []string) (m usl.Measurement, err error) {
 	if len(line) != 2 {
-		err = fmt.Errorf("invalid line at line %d", i)
+		err = fmt.Errorf("invalid line at line %d", i+1)
 		return
 	}
 
 	m.X, err = strconv.ParseFloat(line[0], 64)
 	if err != nil {
-		err = fmt.Errorf("%v at line %d, column 0", err, i)
+		err = fmt.Errorf("%v at line %d, column 1", err, i+1)
 		return
 	}
 
 	m.Y, err = strconv.ParseFloat(line[1], 64)
 	if err != nil {
-		err = fmt.Errorf("%v at line %d, column 1", err, i)
+		err = fmt.Errorf("%v at line %d, column 2", err, i+1)
 		return
 	}
 

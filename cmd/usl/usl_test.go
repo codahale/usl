@@ -34,3 +34,42 @@ func TestParsing(t *testing.T) {
 		}
 	}
 }
+
+func TestBadLine(t *testing.T) {
+	m, err := parseLine(0, []string{"funk"})
+	if err == nil {
+		t.Fatalf("Shouldn't have parsed, but returned %v", m)
+	}
+
+	expected := "invalid line at line 1"
+	actual := err.Error()
+	if actual != expected {
+		t.Fatalf("Expected %v but was %v", expected, actual)
+	}
+}
+
+func TestBadX(t *testing.T) {
+	m, err := parseLine(0, []string{"f", "1"})
+	if err == nil {
+		t.Fatalf("Shouldn't have parsed, but returned %v", m)
+	}
+
+	expected := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 1"
+	actual := err.Error()
+	if actual != expected {
+		t.Fatalf("Expected %v but was %v", expected, actual)
+	}
+}
+
+func TestBadY(t *testing.T) {
+	m, err := parseLine(0, []string{"1", "f"})
+	if err == nil {
+		t.Fatalf("Shouldn't have parsed, but returned %v", m)
+	}
+
+	expected := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 2"
+	actual := err.Error()
+	if actual != expected {
+		t.Fatalf("Expected %v but was %v", expected, actual)
+	}
+}
