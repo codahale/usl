@@ -1,4 +1,4 @@
-// Package usl provides functional to build Universal Scalability Law models
+// Package usl provides functionality to build Universal Scalability Law models
 // from sets of observed measurements.
 package usl
 
