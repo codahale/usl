@@ -59,8 +59,8 @@ func TestBuild(t *testing.T) {
 		t.Errorf("Bad Y: %f", m.Y)
 	}
 
-	if m.Nmax != 120 {
-		t.Errorf("Bad Nmax: %d", m.Nmax)
+	if m.Peak != 120 {
+		t.Errorf("Bad Peak: %d", m.Peak)
 	}
 
 	expected := 1164.4929146148988

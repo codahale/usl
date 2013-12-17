@@ -129,7 +129,7 @@ func TestMainRun(t *testing.T) {
 		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
 	}
 
-	expected = "Model:\n\tα     = 0.020303\n\tβ     = 0.000067\n\tN max = 120\n\n"
+	expected = "Model:\n\tα:    0.020303\n\tβ:    0.000067\n\tpeak: X=120, Y=1782.31\n\n"
 	actual = string(stderrData)
 	if expected != actual {
 		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)

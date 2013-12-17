@@ -39,15 +39,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	model, err := usl.Build(measurements)
+	m, err := usl.Build(measurements)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println("Model:")
-	log.Printf("\tα     = %f\n", model.Alpha)
-	log.Printf("\tβ     = %f\n", model.Beta)
-	log.Printf("\tN max = %d\n", model.Nmax)
+	log.Printf("\tα:    %f\n", m.Alpha)
+	log.Printf("\tβ:    %f\n", m.Beta)
+	log.Printf("\tpeak: X=%.0f, Y=%2.2f\n", m.Peak, m.Predict(m.Peak))
 	log.Println()
 
 	for _, s := range flag.Args() {
@@ -55,7 +55,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%f,%f\n", x, model.Predict(x))
+		fmt.Printf("%f,%f\n", x, m.Predict(x))
 	}
 }
 

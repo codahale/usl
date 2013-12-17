@@ -49,7 +49,7 @@ type Model struct {
 	Alpha float64 // Alpha represents the levels of contention.
 	Beta  float64 // Beta represents the coherency delay.
 	Y     float64 // Y is the system's unloaded behavior.
-	Nmax  int     // Nmax is the usage level at which capacity is maximized.
+	Peak  float64 // Peak is the usage level at which output is maximized.
 }
 
 // Predict returns the predicted value at a given utilization level.
@@ -106,7 +106,7 @@ func Build(measurements MeasurementSet) (m Model, err error) {
 	m.Alpha = math.Abs(c[2] - c[1])
 	m.Beta = math.Abs(c[2])
 	m.Y = y0
-	m.Nmax = int(math.Floor(math.Sqrt((1 - m.Alpha) / m.Beta)))
+	m.Peak = math.Floor(math.Sqrt((1 - m.Alpha) / m.Beta))
 
 	return
 }
