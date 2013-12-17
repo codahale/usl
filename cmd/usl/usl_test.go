@@ -123,13 +123,21 @@ func TestMainRun(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := "1.000000,65.000000\n2.000000,127.396329\n3.000000,187.318153\n"
+	expected := `1.000000,65.000000
+2.000000,127.396329
+3.000000,187.318153
+`
 	actual := string(stdoutData)
 	if expected != actual {
 		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
 	}
 
-	expected = "Model:\n\tα:    0.020303\n\tβ:    0.000067\n\tpeak: X=120, Y=1782.31\n\n"
+	expected = `Model:
+	α:    0.020303 (constrained by contention effects)
+	β:    0.000067
+	peak: X=120, Y=1782.31
+
+`
 	actual = string(stderrData)
 	if expected != actual {
 		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
