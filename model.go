@@ -12,10 +12,6 @@ type model struct {
 	nmax, nopt     int
 }
 
-func (m model) String() string {
-	return fmt.Sprintf("α=%f/β=%f/Nmax=%d/Nopt=%d", m.alpha, m.beta, m.nmax, m.nopt)
-}
-
 func (m model) predict(n int) float64 {
 	x := float64(n)
 	c := x / (1 + (m.alpha * (x - 1)) + (m.beta * x * (x - 1)))
