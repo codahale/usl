@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestAnalyze(t *testing.T) {
+func TestBuild(t *testing.T) {
 	measurements := MeasurementSet{
 		Measurement{X: 1, Y: 65},
 		Measurement{X: 18, Y: 996},
