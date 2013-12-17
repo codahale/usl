@@ -34,7 +34,7 @@ func main() {
 		log.Fatal("No input files provided.")
 	}
 
-	measurements, err := parse(*input)
+	measurements, err := parseCSV(*input)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,7 +59,7 @@ func main() {
 	}
 }
 
-func parse(filename string) (usl.MeasurementSet, error) {
+func parseCSV(filename string) (usl.MeasurementSet, error) {
 	measurements := make(usl.MeasurementSet, 0)
 
 	f, err := os.Open(filename)
@@ -75,22 +75,33 @@ func parse(filename string) (usl.MeasurementSet, error) {
 	}
 
 	for i, line := range lines {
-		if len(line) != 2 {
-			return nil, fmt.Errorf("invalid line at line %d", i)
-		}
-
-		x, err := strconv.ParseFloat(line[0], 64)
+		m, err := parseLine(i, line)
 		if err != nil {
-			return nil, fmt.Errorf("%v at line %d, column 0", err, i)
+			return nil, err
 		}
-
-		y, err := strconv.ParseFloat(line[1], 64)
-		if err != nil {
-			return nil, fmt.Errorf("%v at line %d, column 1", err, i)
-		}
-
-		measurements = append(measurements, usl.Measurement{X: x, Y: y})
+		measurements = append(measurements, m)
 	}
 
 	return measurements, nil
+}
+
+func parseLine(i int, line []string) (m usl.Measurement, err error) {
+	if len(line) != 2 {
+		err = fmt.Errorf("invalid line at line %d", i)
+		return
+	}
+
+	m.X, err = strconv.ParseFloat(line[0], 64)
+	if err != nil {
+		err = fmt.Errorf("%v at line %d, column 0", err, i)
+		return
+	}
+
+	m.Y, err = strconv.ParseFloat(line[1], 64)
+	if err != nil {
+		err = fmt.Errorf("%v at line %d, column 1", err, i)
+		return
+	}
+
+	return
 }
