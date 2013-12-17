@@ -54,7 +54,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%d,%f\n", x, model.throughput(x))
+		fmt.Printf("%d,%f\n", x, model.predict(x))
 	}
 }
 
