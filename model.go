@@ -26,14 +26,18 @@ type Measurement struct {
 // MeasurementSet is a sortable set of measurements.
 type MeasurementSet []Measurement
 
+// Len is the number of measurements in the set.
 func (m MeasurementSet) Len() int {
 	return len(m)
 }
 
+// Less reports whether the measurement with index i should sort before the
+// measurement with index j.
 func (m MeasurementSet) Less(i, j int) bool {
 	return m[i].X < m[j].X
 }
 
+// Swap swaps the measurements with indexes i and j.
 func (m MeasurementSet) Swap(i, j int) {
 	x := m[i]
 	m[i] = m[j]
