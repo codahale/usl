@@ -1,8 +1,10 @@
 package main
 
 import (
+	"os"
 	"testing"
 
+	"io/ioutil"
 	"github.com/codahale/usl"
 )
 
@@ -71,5 +73,65 @@ func TestBadY(t *testing.T) {
 	actual := err.Error()
 	if actual != expected {
 		t.Fatalf("Expected %v but was %v", expected, actual)
+	}
+}
+
+func TestMainRun(t *testing.T) {
+	stdout, err := ioutil.TempFile(os.TempDir(), "stdout")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stdout.Close()
+
+	stderr, err := ioutil.TempFile(os.TempDir(), "stderr")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stderr.Close()
+
+	oldStdout := os.Stdout
+	oldStderr := os.Stderr
+	defer func() {
+		os.Stdout = oldStdout
+		os.Stderr = oldStderr
+	}()
+
+	os.Stdout = stdout
+	os.Stderr = stderr
+
+	os.Args = []string{"usl", "-in", "example.csv", "1", "2", "3"}
+
+	main()
+
+	err = stdout.Sync()
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = stderr.Sync()
+	if err != nil {
+		t.Error(err)
+	}
+
+	stdoutData, err := ioutil.ReadFile(stdout.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	stderrData, err := ioutil.ReadFile(stderr.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := "1.000000,65.000000\n2.000000,127.396329\n3.000000,187.318153\n"
+	actual := string(stdoutData)
+	if expected != actual {
+		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
+	}
+
+	expected = "Model:\n\tα     = 0.020303\n\tβ     = 0.000067\n\tN max = 120\n\n"
+	actual = string(stderrData)
+	if expected != actual {
+		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
 	}
 }
