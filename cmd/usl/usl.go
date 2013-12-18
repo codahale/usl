@@ -1,13 +1,66 @@
 // USL is a modeler for the Universal Scalability Law, which can be used in
 // system testing and capacity planning.
 //
-// Usage:
+// As an example, consider doing load testing and capacity planning for an HTTP
+// server. To use USL, we must first gather a set of measurements of the system.
+// These measurements will consist of pairs of simultaneous measurements of the
+// independent and dependent variables. With an HTTP server, it might be tempting
+// to use the rate as the independent variable, but this is a mistake. The rate
+// of requests being handled by the server is actually itself a dependent
+// variable of two other independent variables: the number of concurrent users
+// and the rate at which users send requests.
 //
-//		usl -in data.csv [x ...]
+// As we do our capacity planning, we make the observation that users of our
+// system do ~10 req/sec. (Or, more commonly, we assume this based on a hunch.)
+// By holding this constant, we leave the number of concurrent users as the
+// single remaining independent variable.
+//
+// Our load testing, then, should consist of running a series of tests with an
+// increasing number of simulated users, each performing ~10 req/sec. While the
+// number of users to test with depends heavily on your system, you should be
+// testing at least six different concurrency levels. You should do one test with
+// a single user in order to determine the performance of an uncontended system.
+//
+// After our load testing is done, we should have a CSV file which consists of
+// a series of (x, y) pairs of measurements:
+//
+//		1,4227
+//		2,8382
+//		4,16479
+//		8,31856
+//		16,59564
+//		32,104462
+//		64,162985
+//
+// We can then run the USL binary:
+//
+//		usl -in data.csv
 //
 // USL parses the given CSV file as a series of (x, y) points, calculates the
-// USL parameters using quadratic regression, and then evaluates any given data
-// points.
+// USL parameters using quadratic regression, and then prints out the details of
+// the model:
+//
+//		Model:
+//				α:    0.008550 (constrained by contention effects)
+//				β:    0.000030
+//				peak: X=181, Y=217458.30
+//
+// Among the details here we see two things worth noting. First, the system
+// appears to be constrained by contention, so optimization work should be
+// focused mostly on removing locks, etc. Second, the peak throughput of the
+// system is expected to occur at 181 concurrent users, at which point the system
+// will be expected to handle ~217K req/sec.
+//
+// (These numbers are made up, so don't sweat them.)
+//
+// Finally, we can provide USL a series of additional data points to provide
+// estimates for:
+//
+//		usl -in data.csv 128 256 512
+//
+// USL will output the data in CSV format on STDOUT.
+//
+// For more information, see http://www.perfdynamics.com/Manifesto/USLscalability.html.
 package main
 
 import (
