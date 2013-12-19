@@ -97,6 +97,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	printModel(m)
+
+	printPredictions(m)
+}
+
+func printModel(m usl.Model) {
 	var a, b string
 	if m.Alpha > m.Beta {
 		a = " (constrained by contention effects)"
@@ -109,7 +115,9 @@ func main() {
 	log.Printf("\tβ:    %f%s\n", m.Beta, b)
 	log.Printf("\tpeak: X=%.0f, Y=%2.2f\n", m.Peak, m.Predict(m.Peak))
 	log.Println()
+}
 
+func printPredictions(m usl.Model) {
 	for _, s := range flag.Args() {
 		x, err := strconv.ParseFloat(s, 64)
 		if err != nil {
