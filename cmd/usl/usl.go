@@ -76,7 +76,17 @@ import (
 
 var (
 	input = flag.String("in", "", "input file")
+	xCol  = flag.Int("x_col", 1, "column index of X values")
+	yCol  = flag.Int("y_col", 2, "column index of Y values")
+	skip  = flag.Bool("skip_headers", false, "skip the first line")
 )
+
+func init() {
+	flag.Usage = func() {
+		fmt.Printf("Usage: usl <-in input.csv> [options] [points...]\n\n")
+		flag.PrintDefaults()
+	}
+}
 
 func main() {
 	log.SetFlags(0) // don't prefix the log statements
@@ -87,7 +97,7 @@ func main() {
 		log.Fatal("No input files provided.")
 	}
 
-	measurements, err := parseCSV(*input)
+	measurements, err := parseCSV(*input, *xCol, *yCol, *skip)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -127,7 +137,7 @@ func printPredictions(m usl.Model) {
 	}
 }
 
-func parseCSV(filename string) (usl.MeasurementSet, error) {
+func parseCSV(filename string, xCol, yCol int, skipHeaders bool) (usl.MeasurementSet, error) {
 	measurements := make(usl.MeasurementSet, 0)
 
 	f, err := os.Open(filename)
@@ -141,9 +151,12 @@ func parseCSV(filename string) (usl.MeasurementSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	if skipHeaders {
+		lines = lines[1:]
+	}
 
 	for i, line := range lines {
-		m, err := parseLine(i, line)
+		m, err := parseLine(i, xCol, yCol, line)
 		if err != nil {
 			return nil, err
 		}
@@ -153,21 +166,21 @@ func parseCSV(filename string) (usl.MeasurementSet, error) {
 	return measurements, nil
 }
 
-func parseLine(i int, line []string) (m usl.Measurement, err error) {
+func parseLine(i, xCol, yCol int, line []string) (m usl.Measurement, err error) {
 	if len(line) != 2 {
 		err = fmt.Errorf("invalid line at line %d", i+1)
 		return
 	}
 
-	m.X, err = strconv.ParseFloat(line[0], 64)
+	m.X, err = strconv.ParseFloat(line[xCol-1], 64)
 	if err != nil {
-		err = fmt.Errorf("%v at line %d, column 1", err, i+1)
+		err = fmt.Errorf("%v at line %d, column %d", err, i+1, xCol)
 		return
 	}
 
-	m.Y, err = strconv.ParseFloat(line[1], 64)
+	m.Y, err = strconv.ParseFloat(line[yCol-1], 64)
 	if err != nil {
-		err = fmt.Errorf("%v at line %d, column 2", err, i+1)
+		err = fmt.Errorf("%v at line %d, column %d", err, i+1, yCol)
 		return
 	}
 

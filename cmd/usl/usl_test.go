@@ -19,7 +19,7 @@ func TestParsing(t *testing.T) {
 		usl.Measurement{X: 216, Y: 1702},
 	}
 
-	actual, err := parseCSV("example.csv")
+	actual, err := parseCSV("example.csv", 1, 2, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestParsing(t *testing.T) {
 }
 
 func TestBadLine(t *testing.T) {
-	m, err := parseLine(0, []string{"funk"})
+	m, err := parseLine(0, 1, 2, []string{"funk"})
 	if err == nil {
 		t.Fatalf("Shouldn't have parsed, but returned %v", m)
 	}
@@ -51,7 +51,7 @@ func TestBadLine(t *testing.T) {
 }
 
 func TestBadX(t *testing.T) {
-	m, err := parseLine(0, []string{"f", "1"})
+	m, err := parseLine(0, 1, 2, []string{"f", "1"})
 	if err == nil {
 		t.Fatalf("Shouldn't have parsed, but returned %v", m)
 	}
@@ -64,7 +64,7 @@ func TestBadX(t *testing.T) {
 }
 
 func TestBadY(t *testing.T) {
-	m, err := parseLine(0, []string{"1", "f"})
+	m, err := parseLine(0, 1, 2, []string{"1", "f"})
 	if err == nil {
 		t.Fatalf("Shouldn't have parsed, but returned %v", m)
 	}
