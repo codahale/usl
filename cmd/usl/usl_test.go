@@ -77,6 +77,30 @@ func TestBadY(t *testing.T) {
 }
 
 func TestMainRun(t *testing.T) {
+	expected := `1.000000,65.000000
+2.000000,127.396329
+3.000000,187.318153
+`
+	stdout, stderr := fakeMain(t, "-in", "example.csv", "1", "2", "3")
+
+	actual := string(stdout)
+	if expected != actual {
+		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
+	}
+
+	expected = `Model:
+	α:    0.020303 (constrained by contention effects)
+	β:    0.000067
+	peak: X=120, Y=1782.31
+
+`
+	actual = string(stderr)
+	if expected != actual {
+		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
+	}
+}
+
+func fakeMain(t *testing.T, args ...string) (stdoutData, stderrData []byte) {
 	stdout, err := ioutil.TempFile(os.TempDir(), "stdout")
 	if err != nil {
 		t.Fatal(err)
@@ -99,7 +123,7 @@ func TestMainRun(t *testing.T) {
 	os.Stdout = stdout
 	os.Stderr = stderr
 
-	os.Args = []string{"usl", "-in", "example.csv", "1", "2", "3"}
+	os.Args = append([]string{"usl"}, args...)
 
 	main()
 
@@ -113,33 +137,15 @@ func TestMainRun(t *testing.T) {
 		t.Error(err)
 	}
 
-	stdoutData, err := ioutil.ReadFile(stdout.Name())
+	stdoutData, err = ioutil.ReadFile(stdout.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	stderrData, err := ioutil.ReadFile(stderr.Name())
+	stderrData, err = ioutil.ReadFile(stderr.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := `1.000000,65.000000
-2.000000,127.396329
-3.000000,187.318153
-`
-	actual := string(stdoutData)
-	if expected != actual {
-		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
-	}
-
-	expected = `Model:
-	α:    0.020303 (constrained by contention effects)
-	β:    0.000067
-	peak: X=120, Y=1782.31
-
-`
-	actual = string(stderrData)
-	if expected != actual {
-		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
-	}
+	return
 }
