@@ -68,7 +68,7 @@ func (m Model) String() string {
 	}
 
 	return fmt.Sprintf(
-		"Model:\n\tα:    %f%s\n\tβ:    %f%s\n\tpeak: X=%.0f, Y=%2.2f\n",
+		"Model:\n\tα:    %f%s\n\tβ:    %f%s\n\tpeak: X=%.0f, Y=%2.2f",
 		m.Alpha, a, m.Beta, b, m.Peak, m.Predict(m.Peak),
 	)
 }
