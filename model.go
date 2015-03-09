@@ -4,6 +4,7 @@ package usl
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"sort"
 
@@ -56,6 +57,20 @@ type Model struct {
 func (m Model) Predict(x float64) float64 {
 	c := x / (1 + (m.Alpha * (x - 1)) + (m.Beta * x * (x - 1)))
 	return c * m.Y
+}
+
+func (m Model) String() string {
+	var a, b string
+	if m.Alpha > m.Beta {
+		a = " (constrained by contention effects)"
+	} else if m.Alpha < m.Beta {
+		b = " (constrained by coherency effects)"
+	}
+
+	return fmt.Sprintf(
+		"Model:\n\tα:    %f%s\n\tβ:    %f%s\n\tpeak: X=%.0f, Y=%2.2f\n",
+		m.Alpha, a, m.Beta, b, m.Peak, m.Predict(m.Peak),
+	)
 }
 
 // Build returns a model whose parameters are generated from the given

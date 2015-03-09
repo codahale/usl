@@ -113,17 +113,7 @@ func main() {
 }
 
 func printModel(m usl.Model) {
-	var a, b string
-	if m.Alpha > m.Beta {
-		a = " (constrained by contention effects)"
-	} else if m.Alpha < m.Beta {
-		b = " (constrained by coherency effects)"
-	}
-
-	log.Println("Model:")
-	log.Printf("\tα:    %f%s\n", m.Alpha, a)
-	log.Printf("\tβ:    %f%s\n", m.Beta, b)
-	log.Printf("\tpeak: X=%.0f, Y=%2.2f\n", m.Peak, m.Predict(m.Peak))
+	log.Println(m)
 	log.Println()
 }
 
