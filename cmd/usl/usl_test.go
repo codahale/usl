@@ -1,10 +1,10 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 	"testing"
 
-	"io/ioutil"
 	"github.com/codahale/usl"
 )
 
@@ -96,7 +96,7 @@ func TestMainRun(t *testing.T) {
 `
 	actual = string(stderr)
 	if expected != actual {
-		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
+		t.Errorf("Expected\n%q\nbut was\n%q", expected, actual)
 	}
 }
 
