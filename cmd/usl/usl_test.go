@@ -25,7 +25,7 @@ func TestParsing(t *testing.T) {
 	}
 
 	if len(expected) != len(actual) {
-		t.Fatalf("Expected %d measurements, but was %d", len(expected), len(actual))
+		t.Fatalf("Expected %v measurements, but was %v", len(expected), len(actual))
 	}
 
 	for i, a := range actual {
@@ -105,13 +105,13 @@ func fakeMain(t *testing.T, args ...string) (stdoutData, stderrData []byte) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer stdout.Close()
+	defer func() { _ = stdout.Close() }()
 
 	stderr, err := ioutil.TempFile(os.TempDir(), "stderr")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer stderr.Close()
+	defer func() { _ = stderr.Close() }()
 
 	oldStdout := os.Stdout
 	oldStderr := os.Stderr

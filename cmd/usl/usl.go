@@ -134,7 +134,7 @@ func parseCSV(filename string, xCol, yCol int, skipHeaders bool) (usl.Measuremen
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	r := csv.NewReader(f)
 	lines, err := r.ReadAll()

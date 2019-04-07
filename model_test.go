@@ -48,19 +48,19 @@ func TestBuild(t *testing.T) {
 	}
 
 	if math.Abs(m.Alpha-0.0203030740304324) > 0.00001 {
-		t.Errorf("Bad alpha: %f", m.Alpha)
+		t.Errorf("Bad alpha: %v", m.Alpha)
 	}
 
 	if math.Abs(m.Beta-6.7246130982513e-5) > 0.00001 {
-		t.Errorf("Bad beta: %f", m.Beta)
+		t.Errorf("Bad beta: %v", m.Beta)
 	}
 
 	if m.Y != 65 {
-		t.Errorf("Bad Y: %f", m.Y)
+		t.Errorf("Bad Y: %v", m.Y)
 	}
 
 	if m.Peak != 120 {
-		t.Errorf("Bad Peak: %d", m.Peak)
+		t.Errorf("Bad Peak: %v", m.Peak)
 	}
 
 	expected := 1164.4929146148988

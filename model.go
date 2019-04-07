@@ -8,7 +8,7 @@ import (
 	"math"
 	"sort"
 
-	"code.google.com/p/gomatrix/matrix"
+	"github.com/skelterjohn/go.matrix"
 )
 
 var (
