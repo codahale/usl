@@ -69,6 +69,7 @@ func (m *Model) LatencyAtThroughput(x float64) float64 {
 func (m *Model) ThroughputAtLatency(r float64) float64 {
 	a := 2 * m.Kappa * (2*m.Lambda*r + m.Sigma - 2)
 	b := math.Sqrt(math.Pow(m.Sigma, 2) + math.Pow(m.Kappa, 2) + a)
+
 	return (b - m.Kappa + m.Sigma) / (2.0 * m.Kappa * r)
 }
 
@@ -79,6 +80,7 @@ func (m *Model) ThroughputAtLatency(r float64) float64 {
 func (m *Model) ConcurrencyAtLatency(r float64) float64 {
 	a := 2 * m.Kappa * ((2 * m.Lambda * r) + m.Sigma - 2)
 	b := math.Sqrt(math.Pow(m.Sigma, 2) + math.Pow(m.Kappa, 2) + a)
+
 	return (m.Kappa - m.Sigma + b) / (2 * m.Kappa)
 }
 
@@ -118,6 +120,8 @@ func Build(measurements []Measurement) (m *Model, err error) {
 
 	// Calculate an initial guess at the model parameters.
 	init := []float64{0.1, 0.01, 0}
+
+	// Use max(x/n) as initial lambda.
 	for _, m := range measurements {
 		v := m.Throughput / m.Concurrency
 		if v > init[2] {

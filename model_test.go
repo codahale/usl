@@ -8,6 +8,7 @@ import (
 )
 
 var (
+	//nolint:gochecknoglobals // fine in tests
 	epsilon = cmpopts.EquateApprox(0.00001, 0.00001)
 )
 
@@ -213,6 +214,7 @@ func BenchmarkBuild(b *testing.B) {
 	}
 }
 
+//nolint:gochecknoglobals // fine in tests
 var measurements = []Measurement{
 	{Concurrency: 1, Throughput: 955.16},
 	{Concurrency: 2, Throughput: 1878.91},

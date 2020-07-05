@@ -56,6 +56,7 @@
 // USL will output the data in CSV format on STDOUT.
 //
 // For more information, see http://www.perfdynamics.com/Manifesto/USLscalability.html.
+//nolint:goerr113 // not a package
 package main
 
 import (
@@ -69,23 +70,19 @@ import (
 	"github.com/codahale/usl"
 )
 
-var (
-	input = flag.String("in", "", "input file")
-	nCol  = flag.Int("n_col", 1, "column index of concurrency values")
-	rCol  = flag.Int("r_col", 2, "column index of latency values")
-	skip  = flag.Bool("skip_headers", false, "skip the first line")
-)
+func main() {
+	input := flag.String("in", "", "input file")
+	nCol := flag.Int("n_col", 1, "column index of concurrency values")
+	rCol := flag.Int("r_col", 2, "column index of latency values")
+	skip := flag.Bool("skip_headers", false, "skip the first line")
 
-func init() {
+	log.SetFlags(0) // don't prefix the log statements
+	log.SetOutput(os.Stderr)
+
 	flag.Usage = func() {
 		fmt.Printf("Usage: usl <-in input.csv> [options] [points...]\n\n")
 		flag.PrintDefaults()
 	}
-}
-
-func main() {
-	log.SetFlags(0) // don't prefix the log statements
-	log.SetOutput(os.Stderr)
 	flag.Parse()
 
 	if len(*input) == 0 {
@@ -110,15 +107,19 @@ func main() {
 func printModel(m *usl.Model) {
 	log.Printf("URL parameters: σ=%v, κ=%v, λ=%v\n", m.Sigma, m.Kappa, m.Lambda)
 	log.Printf("\tmax throughput: %v, max concurrency: %v\n", m.MaxThroughput(), m.MaxConcurrency())
+
 	if m.ContentionConstrained() {
 		log.Println("\tcontention constrained")
 	}
+
 	if m.CoherencyConstrained() {
 		log.Println("\tcoherence constrained")
 	}
+
 	if m.Limitless() {
 		log.Println("\tlimitless")
 	}
+
 	log.Println()
 }
 
@@ -128,24 +129,28 @@ func printPredictions(m *usl.Model) {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		fmt.Printf("%f,%f\n", n, m.ThroughputAtConcurrency(n))
 	}
 }
 
 func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurement, error) {
-	var measurements []usl.Measurement
+	measurements := make([]usl.Measurement, 0, 100)
 
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
+
 	defer func() { _ = f.Close() }()
 
 	r := csv.NewReader(f)
+
 	lines, err := r.ReadAll()
 	if err != nil {
 		return nil, err
 	}
+
 	if skipHeaders {
 		lines = lines[1:]
 	}
@@ -155,29 +160,27 @@ func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurem
 		if err != nil {
 			return nil, err
 		}
-		measurements = append(measurements, m)
+
+		measurements = append(measurements, *m)
 	}
 
 	return measurements, nil
 }
 
-func parseLine(i, xCol, yCol int, line []string) (m usl.Measurement, err error) {
+func parseLine(i, xCol, yCol int, line []string) (*usl.Measurement, error) {
 	if len(line) != 2 {
-		err = fmt.Errorf("invalid line at line %d", i+1)
-		return
+		return nil, fmt.Errorf("invalid line at line %d", i+1)
 	}
 
-	m.Concurrency, err = strconv.ParseFloat(line[xCol-1], 64)
+	n, err := strconv.ParseFloat(line[xCol-1], 64)
 	if err != nil {
-		err = fmt.Errorf("%v at line %d, column %d", err, i+1, xCol)
-		return
+		return nil, fmt.Errorf("%v at line %d, column %d", err, i+1, xCol)
 	}
 
-	m.Throughput, err = strconv.ParseFloat(line[yCol-1], 64)
+	x, err := strconv.ParseFloat(line[yCol-1], 64)
 	if err != nil {
-		err = fmt.Errorf("%v at line %d, column %d", err, i+1, yCol)
-		return
+		return nil, fmt.Errorf("%v at line %d, column %d", err, i+1, yCol)
 	}
 
-	return
+	return usl.ConcurrencyAndThroughput(n, x), nil
 }

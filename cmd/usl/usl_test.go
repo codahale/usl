@@ -43,8 +43,7 @@ func TestBadLine(t *testing.T) {
 		t.Fatalf("Shouldn't have parsed, but returned %v", m)
 	}
 
-	expected := "invalid line at line 1"
-	actual := err.Error()
+	expected, actual := "invalid line at line 1", err.Error()
 	if actual != expected {
 		t.Fatalf("Expected %v but was %v", expected, actual)
 	}
@@ -56,8 +55,7 @@ func TestBadX(t *testing.T) {
 		t.Fatalf("Shouldn't have parsed, but returned %v", m)
 	}
 
-	expected := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 1"
-	actual := err.Error()
+	expected, actual := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 1", err.Error()
 	if actual != expected {
 		t.Fatalf("Expected %v but was %v", expected, actual)
 	}
@@ -69,8 +67,7 @@ func TestBadY(t *testing.T) {
 		t.Fatalf("Shouldn't have parsed, but returned %v", m)
 	}
 
-	expected := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 2"
-	actual := err.Error()
+	expected, actual := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 2", err.Error()
 	if actual != expected {
 		t.Fatalf("Expected %v but was %v", expected, actual)
 	}
@@ -94,26 +91,30 @@ func TestMainRun(t *testing.T) {
 
 `
 	actual = string(stderr)
+
 	if expected != actual {
 		t.Errorf("Expected\n%q\nbut was\n%q", expected, actual)
 	}
 }
 
-func fakeMain(t *testing.T, args ...string) (stdoutData, stderrData []byte) {
+func fakeMain(t *testing.T, args ...string) ([]byte, []byte) {
 	stdout, err := ioutil.TempFile(os.TempDir(), "stdout")
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	defer func() { _ = stdout.Close() }()
 
 	stderr, err := ioutil.TempFile(os.TempDir(), "stderr")
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	defer func() { _ = stderr.Close() }()
 
 	oldStdout := os.Stdout
 	oldStderr := os.Stderr
+
 	defer func() {
 		os.Stdout = oldStdout
 		os.Stderr = oldStderr
@@ -136,15 +137,15 @@ func fakeMain(t *testing.T, args ...string) (stdoutData, stderrData []byte) {
 		t.Error(err)
 	}
 
-	stdoutData, err = ioutil.ReadFile(stdout.Name())
+	stdoutData, err := ioutil.ReadFile(stdout.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	stderrData, err = ioutil.ReadFile(stderr.Name())
+	stderrData, err := ioutil.ReadFile(stderr.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	return
+	return stdoutData, stderrData
 }
