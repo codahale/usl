@@ -155,32 +155,32 @@ func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurem
 	}
 
 	for i, line := range lines {
-		m, err := parseLine(i, nCol, rCol, line)
+		n, x, err := parseLine(i, nCol, rCol, line)
 		if err != nil {
 			return nil, err
 		}
 
-		measurements = append(measurements, *m)
+		measurements = append(measurements, usl.ConcurrencyAndThroughput(n, x))
 	}
 
 	return measurements, nil
 }
 
 //nolint:goerr113 // not a package
-func parseLine(i, xCol, yCol int, line []string) (*usl.Measurement, error) {
+func parseLine(i, nCol, xCol int, line []string) (float64, float64, error) {
 	if len(line) != 2 {
-		return nil, fmt.Errorf("invalid line at line %d", i+1)
+		return 0, 0, fmt.Errorf("invalid line at line %d", i+1)
 	}
 
-	n, err := strconv.ParseFloat(line[xCol-1], 64)
+	n, err := strconv.ParseFloat(line[nCol-1], 64)
 	if err != nil {
-		return nil, fmt.Errorf("%v at line %d, column %d", err, i+1, xCol)
+		return 0, 0, fmt.Errorf("%v at line %d, column %d", err, i+1, nCol)
 	}
 
-	x, err := strconv.ParseFloat(line[yCol-1], 64)
+	x, err := strconv.ParseFloat(line[xCol-1], 64)
 	if err != nil {
-		return nil, fmt.Errorf("%v at line %d, column %d", err, i+1, yCol)
+		return 0, 0, fmt.Errorf("%v at line %d, column %d", err, i+1, xCol)
 	}
 
-	return usl.ConcurrencyAndThroughput(n, x), nil
+	return n, x, nil
 }

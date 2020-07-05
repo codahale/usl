@@ -38,9 +38,9 @@ func TestParsing(t *testing.T) {
 }
 
 func TestBadLine(t *testing.T) {
-	m, err := parseLine(0, 1, 2, []string{"funk"})
+	n, x, err := parseLine(0, 1, 2, []string{"funk"})
 	if err == nil {
-		t.Fatalf("Shouldn't have parsed, but returned %v", m)
+		t.Fatalf("Shouldn't have parsed, but returned %v/%v", n, x)
 	}
 
 	expected, actual := "invalid line at line 1", err.Error()
@@ -49,10 +49,10 @@ func TestBadLine(t *testing.T) {
 	}
 }
 
-func TestBadX(t *testing.T) {
-	m, err := parseLine(0, 1, 2, []string{"f", "1"})
+func TestBadConcurrency(t *testing.T) {
+	n, x, err := parseLine(0, 1, 2, []string{"f", "1"})
 	if err == nil {
-		t.Fatalf("Shouldn't have parsed, but returned %v", m)
+		t.Fatalf("Shouldn't have parsed, but returned %v/%v", n, x)
 	}
 
 	expected, actual := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 1", err.Error()
@@ -61,10 +61,10 @@ func TestBadX(t *testing.T) {
 	}
 }
 
-func TestBadY(t *testing.T) {
-	m, err := parseLine(0, 1, 2, []string{"1", "f"})
+func TestBadThroughput(t *testing.T) {
+	n, x, err := parseLine(0, 1, 2, []string{"1", "f"})
 	if err == nil {
-		t.Fatalf("Shouldn't have parsed, but returned %v", m)
+		t.Fatalf("Shouldn't have parsed, but returned %v/%v", n, x)
 	}
 
 	expected, actual := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 2", err.Error()
