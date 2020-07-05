@@ -142,7 +142,7 @@ func Build(measurements []Measurement) (m *Model, err error) {
 		Dim:        3,                 // Three parameters in the model.
 		Size:       len(measurements), // Use all measurements to calculate residuals.
 		Func:       f,                 // Reduce the residuals of model predictions to observations.
-		Jac:        j.Jac,             // Use the default Jaccardian formula.
+		Jac:        j.Jac,             // Approximate the Jacobian by finite differences.
 		InitParams: init,              // Use our initial guesses at parameters.
 		Tau:        1e-6,              // Need a non-zero initial damping factor.
 		Eps1:       1e-8,              // Small but non-zero values here prevent singular matrices.
