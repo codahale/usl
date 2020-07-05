@@ -152,7 +152,7 @@ func Build(measurements []Measurement) (m *Model, err error) {
 	// Calculate the model parameters.
 	results, err := lm.LM(p, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to build model: %w", err)
 	}
 
 	// Return the model.
