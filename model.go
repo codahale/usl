@@ -66,10 +66,8 @@ func (m *Model) LatencyAtThroughput(x float64) float64 {
 //
 // See "Practical Scalability Analysis with the Universal Scalability Law, Equation 9".
 func (m *Model) ThroughputAtLatency(r float64) float64 {
-	a := 2 * m.Kappa * (2*m.Lambda*r + m.Sigma - 2)
-	b := math.Sqrt(math.Pow(m.Sigma, 2) + math.Pow(m.Kappa, 2) + a)
-
-	return (b - m.Kappa + m.Sigma) / (2.0 * m.Kappa * r)
+	return (math.Sqrt(math.Pow(m.Sigma, 2)+math.Pow(m.Kappa, 2)+
+		2*m.Kappa*(2*m.Lambda*r+m.Sigma-2)) - m.Kappa + m.Sigma) / (2.0 * m.Kappa * r)
 }
 
 // ConcurrencyAtLatency returns the expected number of concurrent workers given a mean latency,
@@ -77,10 +75,10 @@ func (m *Model) ThroughputAtLatency(r float64) float64 {
 //
 // See "Practical Scalability Analysis with the Universal Scalability Law, Equation 10".
 func (m *Model) ConcurrencyAtLatency(r float64) float64 {
-	a := 2 * m.Kappa * ((2 * m.Lambda * r) + m.Sigma - 2)
-	b := math.Sqrt(math.Pow(m.Sigma, 2) + math.Pow(m.Kappa, 2) + a)
-
-	return (m.Kappa - m.Sigma + b) / (2 * m.Kappa)
+	return (m.Kappa - m.Sigma +
+		math.Sqrt(math.Pow(m.Sigma, 2)+
+			math.Pow(m.Kappa, 2)+
+			2*m.Kappa*((2*m.Lambda*r)+m.Sigma-2))) / (2 * m.Kappa)
 }
 
 // ConcurrencyAtThroughput returns the expected number of concurrent workers at a particular
