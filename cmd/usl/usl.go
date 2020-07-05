@@ -56,7 +56,6 @@
 // USL will output the data in CSV format on STDOUT.
 //
 // For more information, see http://www.perfdynamics.com/Manifesto/USLscalability.html.
-//nolint:goerr113 // not a package
 package main
 
 import (
@@ -167,6 +166,7 @@ func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurem
 	return measurements, nil
 }
 
+//nolint:goerr113 // not a package
 func parseLine(i, xCol, yCol int, line []string) (*usl.Measurement, error) {
 	if len(line) != 2 {
 		return nil, fmt.Errorf("invalid line at line %d", i+1)
