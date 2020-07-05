@@ -88,7 +88,9 @@ func TestMainRun(t *testing.T) {
 		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
 	}
 
-	expected = `Model{σ=0.02772985648395876, κ=0.00010434289088915312, λ=89.98778453648904}
+	expected = `URL parameters: σ=0.02772985648395876, κ=0.00010434289088915312, λ=89.98778453648904
+	max throughput: 1883.7622524836281, max concurrency: 96
+	contention constrained
 
 `
 	actual = string(stderr)
