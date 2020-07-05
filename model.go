@@ -11,8 +11,7 @@ import (
 )
 
 var (
-	// ErrInsufficientMeasurements is returned when less than 6 measurements
-	// were provided.
+	// ErrInsufficientMeasurements is returned when fewer than 6 measurements were provided.
 	ErrInsufficientMeasurements = errors.New("usl: need at least 6 measurements")
 )
 
