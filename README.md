@@ -42,7 +42,7 @@ After you're done load testing, you should have a set of measurements shaped lik
 |          7|   5931.37|
 |          8|   6531.08|
 
-Now you can build a model and begin estimating things
+Now you can build a model and begin estimating things.
 
 ### As A CLI Tool
 
