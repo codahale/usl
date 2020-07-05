@@ -78,22 +78,23 @@ URL parameters: σ=0.01815767039924135, κ=0.0003085235835059208, λ=939.6554017
 
 ```go
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/codahale/usl"
+	"github.com/codahale/usl"
 )
 
 func main() {
-    measurements := []usl.Measurement{
-        usl.ConcurrencyAndThroughput(1, 955.16),
-        usl.ConcurrencyAndThroughput(2, 1878.91),
-        usl.ConcurrencyAndThroughput(3, 2688.01), // etc
-    }
-    
-    model := usl.Build(measurements)
-    for n := 10; n < 200; n += 10 {
-        fmt.Printf("At %d workers, expect %f req/sec\n", n, model.ThroughputAtConcurrency(float64(n)))
-    }
+	measurements := []usl.Measurement{
+		usl.ConcurrencyAndThroughput(1, 955.16),
+		usl.ConcurrencyAndThroughput(2, 1878.91),
+		usl.ConcurrencyAndThroughput(3, 2688.01), // etc
+	}
+
+	model := usl.Build(measurements)
+	for n := 10; n < 200; n += 10 {
+		fmt.Printf("At %d workers, expect %f req/sec\n",
+			n, model.ThroughputAtConcurrency(float64(n)))
+	}
 }
 ```
 
