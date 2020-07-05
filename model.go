@@ -106,8 +106,7 @@ func (m *Model) Limitless() bool {
 
 const minMeasurements = 6
 
-// Build returns a model whose parameters are generated from the given
-// measurements.
+// Build returns a model whose parameters are generated from the given measurements.
 //
 // Finds a set of coefficients for the equation y = λx/(1+σ(x-1)+κx(x-1)) which best fit the
 // observed values using unconstrained least-squares regression. The resulting values for λ, κ, and
@@ -136,19 +135,17 @@ func Build(measurements []Measurement) (m *Model, err error) {
 			dst[i] = v.Throughput - model.ThroughputAtConcurrency(v.Concurrency)
 		}
 	}
-
-	// Use the default Jaccardian formula.
 	j := lm.NumJac{Func: f}
 
-	// Formulate an LM problem with some pretty default params.
+	// Formulate an LM problem.
 	p := lm.LMProblem{
 		Dim:        3,                 // Three parameters in the model.
 		Size:       len(measurements), // Use all measurements to calculate residuals.
-		Func:       f,
-		Jac:        j.Jac,
-		InitParams: init,
-		Tau:        1e-6, // Need a non-zero initial damping factor.
-		Eps1:       1e-8,
+		Func:       f,                 // Reduce the residuals of model predictions to observations.
+		Jac:        j.Jac,             // Use the default Jaccardian formula.
+		InitParams: init,              // Use our initial guesses at parameters.
+		Tau:        1e-6,              // Need a non-zero initial damping factor.
+		Eps1:       1e-8,              // Small but non-zero values here prevent singular matrices.
 		Eps2:       1e-8,
 	}
 
@@ -159,5 +156,9 @@ func Build(measurements []Measurement) (m *Model, err error) {
 	}
 
 	// Return the model.
-	return &Model{Sigma: results.X[0], Kappa: results.X[1], Lambda: results.X[2]}, nil
+	return &Model{
+		Sigma:  results.X[0],
+		Kappa:  results.X[1],
+		Lambda: results.X[2],
+	}, nil
 }
