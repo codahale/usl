@@ -47,7 +47,7 @@ Now you can build a model and begin estimating things.
 ### As A CLI Tool
 
 ```
-go get github.com/codahale/usl/cmd/usl
+$ go get github.com/codahale/usl/cmd/usl
 ```
 
 ```
