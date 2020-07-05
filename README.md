@@ -42,7 +42,39 @@ After you're done load testing, you should have a set of measurements shaped lik
 |          7|   5931.37|
 |          8|   6531.08|
 
-Now you can build a model and begin estimating things:
+Now you can build a model and begin estimating things
+
+### As A CLI Tool
+
+```
+go get github.com/codahale/usl/cmd/usl
+```
+
+```
+$ cat measurements.csv
+1,955.16
+2,1878.91
+3,2688.01
+etc.
+```
+
+```
+$ usl -in measurements.csv 10 20 30 40 50 60 70 80
+URL parameters: σ=0.01815767039924135, κ=0.0003085235835059208, λ=939.65540176714
+	max throughput: 17844.03172599732, max concurrency: 56
+	contention constrained
+
+10.000000,7888.400960
+50.000000,17758.775645
+100.000000,16057.015558
+150.000000,13295.762381
+200.000000,11125.043694
+250.000000,9500.353742
+300.000000,8265.864028
+```
+
+### As A Go Library
+
 
 ```go
 import (
@@ -59,8 +91,8 @@ func main() {
     }
     
     model := usl.Build(measurements)
-    for i := 10; i < 200; i += 10 {
-        fmt.Printf("At %d workers, expect %f req/sec\n", i, model.ThroughputAtConcurrency(i))
+    for n := 10; n < 200; n += 10 {
+        fmt.Printf("At %d workers, expect %f req/sec\n", n, model.ThroughputAtConcurrency(float64(n)))
     }
 }
 ```
