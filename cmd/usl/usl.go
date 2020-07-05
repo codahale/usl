@@ -22,7 +22,7 @@
 // a single user in order to determine the performance of an uncontended system.
 //
 // After our load testing is done, we should have a CSV file which consists of
-// a series of (x, y) pairs of measurements:
+// a series of (concurrency, throughput) pairs of measurements:
 //
 //		1,4227
 //		2,8382
@@ -36,14 +36,14 @@
 //
 //		usl -in data.csv
 //
-// USL parses the given CSV file as a series of (x, y) points, calculates the
+// USL parses the given CSV file as a series of (concurrency, throughput) points, calculates the
 // USL parameters using quadratic regression, and then prints out the details of
 // the model:
 //
 //		Model:
 //				α:    0.008550 (constrained by contention effects)
 //				β:    0.000030
-//				peak: X=181, Y=217458.30
+//				peak: Concurrency=181, Y=217458.30
 //
 // Among the details here we see two things worth noting. First, the system
 // appears to be constrained by contention, so optimization work should be
@@ -76,8 +76,8 @@ import (
 
 var (
 	input = flag.String("in", "", "input file")
-	xCol  = flag.Int("x_col", 1, "column index of X values")
-	yCol  = flag.Int("y_col", 2, "column index of Y values")
+	nCol  = flag.Int("n_col", 1, "column index of concurrency values")
+	rCol  = flag.Int("r_col", 2, "column index of latency values")
 	skip  = flag.Bool("skip_headers", false, "skip the first line")
 )
 
@@ -97,7 +97,7 @@ func main() {
 		log.Fatal("No input files provided.")
 	}
 
-	measurements, err := parseCSV(*input, *xCol, *yCol, *skip)
+	measurements, err := parseCSV(*input, *nCol, *rCol, *skip)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,23 +112,23 @@ func main() {
 	printPredictions(m)
 }
 
-func printModel(m usl.Model) {
+func printModel(m *usl.Model) {
 	log.Println(m)
 	log.Println()
 }
 
-func printPredictions(m usl.Model) {
+func printPredictions(m *usl.Model) {
 	for _, s := range flag.Args() {
-		x, err := strconv.ParseFloat(s, 64)
+		n, err := strconv.ParseFloat(s, 64)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%f,%f\n", x, m.Predict(x))
+		fmt.Printf("%f,%f\n", n, m.ThroughputAtConcurrency(n))
 	}
 }
 
-func parseCSV(filename string, xCol, yCol int, skipHeaders bool) (usl.MeasurementSet, error) {
-	measurements := make(usl.MeasurementSet, 0)
+func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurement, error) {
+	var measurements []usl.Measurement
 
 	f, err := os.Open(filename)
 	if err != nil {
@@ -146,7 +146,7 @@ func parseCSV(filename string, xCol, yCol int, skipHeaders bool) (usl.Measuremen
 	}
 
 	for i, line := range lines {
-		m, err := parseLine(i, xCol, yCol, line)
+		m, err := parseLine(i, nCol, rCol, line)
 		if err != nil {
 			return nil, err
 		}
@@ -162,13 +162,13 @@ func parseLine(i, xCol, yCol int, line []string) (m usl.Measurement, err error) 
 		return
 	}
 
-	m.X, err = strconv.ParseFloat(line[xCol-1], 64)
+	m.Concurrency, err = strconv.ParseFloat(line[xCol-1], 64)
 	if err != nil {
 		err = fmt.Errorf("%v at line %d, column %d", err, i+1, xCol)
 		return
 	}
 
-	m.Y, err = strconv.ParseFloat(line[yCol-1], 64)
+	m.Throughput, err = strconv.ParseFloat(line[yCol-1], 64)
 	if err != nil {
 		err = fmt.Errorf("%v at line %d, column %d", err, i+1, yCol)
 		return

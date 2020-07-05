@@ -9,14 +9,14 @@ import (
 )
 
 func TestParsing(t *testing.T) {
-	expected := usl.MeasurementSet{
-		usl.Measurement{X: 1, Y: 65},
-		usl.Measurement{X: 18, Y: 996},
-		usl.Measurement{X: 36, Y: 1652},
-		usl.Measurement{X: 72, Y: 1853},
-		usl.Measurement{X: 108, Y: 1829},
-		usl.Measurement{X: 144, Y: 1775},
-		usl.Measurement{X: 216, Y: 1702},
+	expected := []usl.Measurement{
+		{Concurrency: 1, Throughput: 65},
+		{Concurrency: 18, Throughput: 996},
+		{Concurrency: 36, Throughput: 1652},
+		{Concurrency: 72, Throughput: 1853},
+		{Concurrency: 108, Throughput: 1829},
+		{Concurrency: 144, Throughput: 1775},
+		{Concurrency: 216, Throughput: 1702},
 	}
 
 	actual, err := parseCSV("example.csv", 1, 2, false)
@@ -31,7 +31,7 @@ func TestParsing(t *testing.T) {
 	for i, a := range actual {
 		e := expected[i]
 
-		if a.X != e.X || a.Y != e.Y {
+		if a.Concurrency != e.Concurrency || a.Throughput != e.Throughput {
 			t.Fatalf("Expected %v, but was %v", e, a)
 		}
 	}
@@ -77,9 +77,9 @@ func TestBadY(t *testing.T) {
 }
 
 func TestMainRun(t *testing.T) {
-	expected := `1.000000,65.000000
-2.000000,127.396329
-3.000000,187.318153
+	expected := `1.000000,89.987785
+2.000000,175.083978
+3.000000,255.626353
 `
 	stdout, stderr := fakeMain(t, "-in", "example.csv", "1", "2", "3")
 
@@ -88,10 +88,7 @@ func TestMainRun(t *testing.T) {
 		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
 	}
 
-	expected = `Model:
-	α:    0.020303 (constrained by contention effects)
-	β:    0.000067
-	peak: X=120, Y=1782.31
+	expected = `Model{σ=0.02772985648395876, κ=0.00010434289088915312, λ=89.98778453648904}
 
 `
 	actual = string(stderr)
