@@ -59,7 +59,7 @@ etc.
 ```
 
 ```
-$ usl -in measurements.csv 10 20 30 40 50 60 70 80
+$ usl -in measurements.csv 10 50 100 150 200 250 300
 URL parameters: σ=0.01815767039924135, κ=0.0003085235835059208, λ=939.65540176714
 	max throughput: 17844.03172599732, max concurrency: 56
 	contention constrained
