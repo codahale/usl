@@ -6,6 +6,12 @@ import (
 	"github.com/codahale/usl/internal/assert"
 )
 
+func TestMeasurement_String(t *testing.T) {
+	m := Measurement{Concurrency: 1, Throughput: 2, Latency: 3}
+
+	assert.Equal(t, "String", "(n=1,x=2,r=3)", m.String())
+}
+
 func TestConcurrencyAndLatency(t *testing.T) {
 	m := ConcurrencyAndLatency(3, 0.6)
 

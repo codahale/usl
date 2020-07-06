@@ -106,13 +106,19 @@ func TestModel_ConcurrencyAtLatency(t *testing.T) {
 }
 
 func TestModel_Limitless(t *testing.T) {
-	m := &Model{Sigma: 1, Lambda: 40}
+	m := &Model{Sigma: 1, Kappa: 0, Lambda: 40}
 
 	assert.Equal(t, "Limitless", true, m.Limitless())
 
 	m = build(t)
 
 	assert.Equal(t, "Limitless", false, m.Limitless())
+}
+
+func TestModel_String(t *testing.T) {
+	m := &Model{Sigma: 1, Kappa: 2, Lambda: 3}
+
+	assert.Equal(t, "String", "Model{σ=1,κ=2,λ=3}", m.String())
 }
 
 func BenchmarkBuild(b *testing.B) {

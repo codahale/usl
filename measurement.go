@@ -1,11 +1,17 @@
 package usl
 
+import "fmt"
+
 // Measurement is a simultaneous measurement of at least two of the parameters of Little's Law:
 // concurrency, throughput, and latency. The third parameter is inferred from the other two.
 type Measurement struct {
 	Concurrency float64
 	Throughput  float64
 	Latency     float64
+}
+
+func (m *Measurement) String() string {
+	return fmt.Sprintf("(n=%v,x=%v,r=%v)", m.Concurrency, m.Throughput, m.Latency)
 }
 
 // ConcurrencyAndLatency returns a measurement of a system's latency at a given level of

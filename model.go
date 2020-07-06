@@ -23,7 +23,7 @@ type Model struct {
 }
 
 func (m *Model) String() string {
-	return fmt.Sprintf("Model{σ=%v, κ=%v, λ=%v}", m.Sigma, m.Kappa, m.Lambda)
+	return fmt.Sprintf("Model{σ=%v,κ=%v,λ=%v}", m.Sigma, m.Kappa, m.Lambda)
 }
 
 // ThroughputAtConcurrency returns the expected throughput given a number of concurrent workers,
