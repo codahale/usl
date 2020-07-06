@@ -6,95 +6,68 @@ import (
 	"testing"
 
 	"github.com/codahale/usl"
+	"github.com/codahale/usl/internal/assert"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func TestParsing(t *testing.T) {
-	expected := []usl.Measurement{
-		{Concurrency: 1, Throughput: 65},
-		{Concurrency: 18, Throughput: 996},
-		{Concurrency: 36, Throughput: 1652},
-		{Concurrency: 72, Throughput: 1853},
-		{Concurrency: 108, Throughput: 1829},
-		{Concurrency: 144, Throughput: 1775},
-		{Concurrency: 216, Throughput: 1702},
+	want := []usl.Measurement{
+		usl.ConcurrencyAndThroughput(1, 65),
+		usl.ConcurrencyAndThroughput(18, 996),
+		usl.ConcurrencyAndThroughput(36, 1652),
+		usl.ConcurrencyAndThroughput(72, 1853),
+		usl.ConcurrencyAndThroughput(108, 1829),
+		usl.ConcurrencyAndThroughput(144, 1775),
+		usl.ConcurrencyAndThroughput(216, 1702),
 	}
 
-	actual, err := parseCSV("example.csv", 1, 2, false)
+	got, err := parseCSV("example.csv", 1, 2, false)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if len(expected) != len(actual) {
-		t.Fatalf("Expected %v measurements, but was %v", len(expected), len(actual))
-	}
-
-	for i, a := range actual {
-		e := expected[i]
-
-		if a.Concurrency != e.Concurrency || a.Throughput != e.Throughput {
-			t.Fatalf("Expected %v, but was %v", e, a)
-		}
-	}
+	assert.Equal(t, "measurements", want, got,
+		cmpopts.EquateApprox(0.001, 0.001))
 }
 
 func TestBadLine(t *testing.T) {
-	n, x, err := parseLine(0, 1, 2, []string{"funk"})
+	_, _, err := parseLine(0, 1, 2, []string{"funk"})
 	if err == nil {
-		t.Fatalf("Shouldn't have parsed, but returned %v/%v", n, x)
-	}
-
-	expected, actual := "invalid line at line 1", err.Error()
-	if actual != expected {
-		t.Fatalf("Expected %v but was %v", expected, actual)
+		t.Fatalf("should have failed")
 	}
 }
 
 func TestBadConcurrency(t *testing.T) {
-	n, x, err := parseLine(0, 1, 2, []string{"f", "1"})
+	_, _, err := parseLine(0, 1, 2, []string{"f", "1"})
 	if err == nil {
-		t.Fatalf("Shouldn't have parsed, but returned %v/%v", n, x)
-	}
-
-	expected, actual := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 1", err.Error()
-	if actual != expected {
-		t.Fatalf("Expected %v but was %v", expected, actual)
+		t.Fatalf("should have failed")
 	}
 }
 
 func TestBadThroughput(t *testing.T) {
-	n, x, err := parseLine(0, 1, 2, []string{"1", "f"})
+	_, _, err := parseLine(0, 1, 2, []string{"1", "f"})
 	if err == nil {
-		t.Fatalf("Shouldn't have parsed, but returned %v/%v", n, x)
-	}
-
-	expected, actual := "strconv.ParseFloat: parsing \"f\": invalid syntax at line 1, column 2", err.Error()
-	if actual != expected {
-		t.Fatalf("Expected %v but was %v", expected, actual)
+		t.Fatalf("should have failed")
 	}
 }
 
 func TestMainRun(t *testing.T) {
-	expected := `1.000000,89.987785
-2.000000,175.083978
-3.000000,255.626353
-`
 	stdout, stderr := fakeMain(t, "-in", "example.csv", "1", "2", "3")
 
-	actual := string(stdout)
-	if expected != actual {
-		t.Errorf("Expected\n%s\nbut was\n%s", expected, actual)
-	}
+	assert.Equal(t, "stdout",
+		`1.000000,89.987785
+2.000000,175.083978
+3.000000,255.626353
+`,
+		string(stdout))
 
-	expected = `URL parameters: σ=0.02772985648395876, κ=0.00010434289088915312, λ=89.98778453648904
+	assert.Equal(t, "stderr",
+		`URL parameters: σ=0.02772985648395876, κ=0.00010434289088915312, λ=89.98778453648904
 	max throughput: 1883.7622524836281, max concurrency: 96
 	contention constrained
 
-`
-	actual = string(stderr)
-
-	if expected != actual {
-		t.Errorf("Expected\n%q\nbut was\n%q", expected, actual)
-	}
+`,
+		string(stderr))
 }
 
 func fakeMain(t *testing.T, args ...string) ([]byte, []byte) {

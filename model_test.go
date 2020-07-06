@@ -3,7 +3,7 @@ package usl
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/codahale/usl/internal/assert"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
@@ -14,160 +14,84 @@ var (
 
 func TestModel_Kappa(t *testing.T) {
 	m := build(t)
-	want, got := 7.690945e-4, m.Kappa
 
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Equal(t, "Kappa", 7.690945e-4, m.Kappa, epsilon)
 }
 
 func TestModel_Sigma(t *testing.T) {
 	m := build(t)
-	want, got := 0.02671591, m.Sigma
 
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Equal(t, "Sigma", 0.02671591, m.Sigma, epsilon)
 }
 
 func TestModel_Lambda(t *testing.T) {
 	m := build(t)
-	want, got := 995.6486, m.Lambda
 
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Equal(t, "Lambda", 995.6486, m.Lambda, epsilon)
 }
 
 func TestModel_MaxConcurrency(t *testing.T) {
 	m := build(t)
-	want, got := 35.0, m.MaxConcurrency()
 
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Equal(t, "MaxConcurrency", 35.0, m.MaxConcurrency(), epsilon)
 }
 
 func TestModel_MaxThroughput(t *testing.T) {
 	m := build(t)
-	want, got := 12341.745415132369, m.MaxThroughput()
 
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Equal(t, "MaxThroughput", 12341.745415132369, m.MaxThroughput(), epsilon)
 }
 
 func TestModel_CoherencyConstrained(t *testing.T) {
 	m := build(t)
-	got := m.CoherencyConstrained()
 
-	if diff := cmp.Diff(false, got, epsilon); diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Equal(t, "CoherencyConstrained", false, m.CoherencyConstrained())
 }
 
 func TestModel_ContentionConstrained(t *testing.T) {
 	m := build(t)
 
-	got := m.ContentionConstrained()
-	if diff := cmp.Diff(true, got, epsilon); diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Equal(t, "ContentionConstrained", true, m.ContentionConstrained())
 }
 
 func TestModel_LatencyAtConcurrency(t *testing.T) {
 	m := build(t)
 
-	want, got := 0.0010043702853760425, m.LatencyAtConcurrency(1)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 0.0018077244276309343, m.LatencyAtConcurrency(20)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 0.0028359035794958197, m.LatencyAtConcurrency(35)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
+	assert.Equal(t, "R(N=1)", 0.0010043702853760425, m.LatencyAtConcurrency(1), epsilon)
+	assert.Equal(t, "R(N=20)", 0.0018077244276309343, m.LatencyAtConcurrency(20), epsilon)
+	assert.Equal(t, "R(N=35)", 0.0028359035794958197, m.LatencyAtConcurrency(35), epsilon)
 }
 
 func TestModel_ThroughputAtConcurrency(t *testing.T) {
 	m := build(t)
 
-	want, got := 995.648772003358, m.ThroughputAtConcurrency(1)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 11063.63312570436, m.ThroughputAtConcurrency(20)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 12341.745655201905, m.ThroughputAtConcurrency(35)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
+	assert.Equal(t, "X(N=1)", 995.648772003358, m.ThroughputAtConcurrency(1), epsilon)
+	assert.Equal(t, "X(N=20)", 11063.63312570436, m.ThroughputAtConcurrency(20), epsilon)
+	assert.Equal(t, "X(N=35)", 12341.745655201905, m.ThroughputAtConcurrency(35), epsilon)
 }
 
 func TestModel_ConcurrencyAtThroughput(t *testing.T) {
 	m := build(t)
 
-	want, got := 0.9580998829620233, m.ConcurrencyAtThroughput(955)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 15.350435172752203, m.ConcurrencyAtThroughput(11048)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 17.73220762025387, m.ConcurrencyAtThroughput(12201)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
+	assert.Equal(t, "N(X=955)", 0.9580998829620233, m.ConcurrencyAtThroughput(955), epsilon)
+	assert.Equal(t, "N(X=11048)", 15.350435172752203, m.ConcurrencyAtThroughput(11048), epsilon)
+	assert.Equal(t, "N(X=12201)", 17.73220762025387, m.ConcurrencyAtThroughput(12201), epsilon)
 }
 
 func TestModel_ThroughputAtLatency(t *testing.T) {
 	m := &Model{Sigma: 0.06, Kappa: 0.06, Lambda: 40}
 
-	want, got := 69.38886664887109, m.ThroughputAtLatency(0.03)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 82.91561975888501, m.ThroughputAtLatency(0.04)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 84.06346808612327, m.ThroughputAtLatency(0.05)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
+	assert.Equal(t, "X(R=0.03)", 69.38886664887109, m.ThroughputAtLatency(0.03), epsilon)
+	assert.Equal(t, "X(R=0.04", 82.91561975888501, m.ThroughputAtLatency(0.04), epsilon)
+	assert.Equal(t, "X(R=0.05)", 84.06346808612327, m.ThroughputAtLatency(0.05), epsilon)
 }
 
 func TestModel_LatencyAtThroughput(t *testing.T) {
 	m := &Model{Sigma: 0.06, Kappa: 0.06, Lambda: 40}
 
-	want, got := 0.05875, m.LatencyAtThroughput(400)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 0.094, m.LatencyAtThroughput(500)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 0.235, m.LatencyAtThroughput(600)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
+	assert.Equal(t, "R(N=400)", 0.05875, m.LatencyAtThroughput(400), epsilon)
+	assert.Equal(t, "R(N=500", 0.094, m.LatencyAtThroughput(500), epsilon)
+	assert.Equal(t, "R(N=600)", 0.235, m.LatencyAtThroughput(600), epsilon)
 }
 
 func TestModel_ConcurrencyAtLatency(t *testing.T) {
@@ -176,36 +100,19 @@ func TestModel_ConcurrencyAtLatency(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	want, got := 7.230628979597649, m.ConcurrencyAtLatency(0.0012)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 20.25106409917121, m.ConcurrencyAtLatency(0.0016)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
-
-	want, got = 29.88889360938781, m.ConcurrencyAtLatency(0.0020)
-	if diff := cmp.Diff(want, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
+	assert.Equal(t, "N(R=0.0012)", 7.230628979597649, m.ConcurrencyAtLatency(0.0012), epsilon)
+	assert.Equal(t, "N(R=0.0016)", 20.25106409917121, m.ConcurrencyAtLatency(0.0016), epsilon)
+	assert.Equal(t, "N(R=0.0020)", 29.88889360938781, m.ConcurrencyAtLatency(0.0020), epsilon)
 }
 
 func TestModel_Limitless(t *testing.T) {
 	m := &Model{Sigma: 1, Lambda: 40}
 
-	got := m.Limitless()
-	if diff := cmp.Diff(true, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
+	assert.Equal(t, "Limitless", true, m.Limitless())
 
 	m = build(t)
 
-	got = m.Limitless()
-	if diff := cmp.Diff(false, got, epsilon); diff != "" {
-		t.Error(diff)
-	}
+	assert.Equal(t, "Limitless", false, m.Limitless())
 }
 
 func BenchmarkBuild(b *testing.B) {
@@ -216,38 +123,38 @@ func BenchmarkBuild(b *testing.B) {
 
 //nolint:gochecknoglobals // fine in tests
 var measurements = []Measurement{
-	{Concurrency: 1, Throughput: 955.16},
-	{Concurrency: 2, Throughput: 1878.91},
-	{Concurrency: 3, Throughput: 2688.01},
-	{Concurrency: 4, Throughput: 3548.68},
-	{Concurrency: 5, Throughput: 4315.54},
-	{Concurrency: 6, Throughput: 5130.43},
-	{Concurrency: 7, Throughput: 5931.37},
-	{Concurrency: 8, Throughput: 6531.08},
-	{Concurrency: 9, Throughput: 7219.8},
-	{Concurrency: 10, Throughput: 7867.61},
-	{Concurrency: 11, Throughput: 8278.71},
-	{Concurrency: 12, Throughput: 8646.7},
-	{Concurrency: 13, Throughput: 9047.84},
-	{Concurrency: 14, Throughput: 9426.55},
-	{Concurrency: 15, Throughput: 9645.37},
-	{Concurrency: 16, Throughput: 9897.24},
-	{Concurrency: 17, Throughput: 10097.6},
-	{Concurrency: 18, Throughput: 10240.5},
-	{Concurrency: 19, Throughput: 10532.39},
-	{Concurrency: 20, Throughput: 10798.52},
-	{Concurrency: 21, Throughput: 11151.43},
-	{Concurrency: 22, Throughput: 11518.63},
-	{Concurrency: 23, Throughput: 11806},
-	{Concurrency: 24, Throughput: 12089.37},
-	{Concurrency: 25, Throughput: 12075.41},
-	{Concurrency: 26, Throughput: 12177.29},
-	{Concurrency: 27, Throughput: 12211.41},
-	{Concurrency: 28, Throughput: 12158.93},
-	{Concurrency: 29, Throughput: 12155.27},
-	{Concurrency: 30, Throughput: 12118.04},
-	{Concurrency: 31, Throughput: 12140.4},
-	{Concurrency: 32, Throughput: 12074.39},
+	ConcurrencyAndThroughput(1, 955.16),
+	ConcurrencyAndThroughput(2, 1878.91),
+	ConcurrencyAndThroughput(3, 2688.01),
+	ConcurrencyAndThroughput(4, 3548.68),
+	ConcurrencyAndThroughput(5, 4315.54),
+	ConcurrencyAndThroughput(6, 5130.43),
+	ConcurrencyAndThroughput(7, 5931.37),
+	ConcurrencyAndThroughput(8, 6531.08),
+	ConcurrencyAndThroughput(9, 7219.8),
+	ConcurrencyAndThroughput(10, 7867.61),
+	ConcurrencyAndThroughput(11, 8278.71),
+	ConcurrencyAndThroughput(12, 8646.7),
+	ConcurrencyAndThroughput(13, 9047.84),
+	ConcurrencyAndThroughput(14, 9426.55),
+	ConcurrencyAndThroughput(15, 9645.37),
+	ConcurrencyAndThroughput(16, 9897.24),
+	ConcurrencyAndThroughput(17, 10097.6),
+	ConcurrencyAndThroughput(18, 10240.5),
+	ConcurrencyAndThroughput(19, 10532.39),
+	ConcurrencyAndThroughput(20, 10798.52),
+	ConcurrencyAndThroughput(21, 11151.43),
+	ConcurrencyAndThroughput(22, 11518.63),
+	ConcurrencyAndThroughput(23, 11806),
+	ConcurrencyAndThroughput(24, 12089.37),
+	ConcurrencyAndThroughput(25, 12075.41),
+	ConcurrencyAndThroughput(26, 12177.29),
+	ConcurrencyAndThroughput(27, 12211.41),
+	ConcurrencyAndThroughput(28, 12158.93),
+	ConcurrencyAndThroughput(29, 12155.27),
+	ConcurrencyAndThroughput(30, 12118.04),
+	ConcurrencyAndThroughput(31, 12140.4),
+	ConcurrencyAndThroughput(32, 12074.39),
 }
 
 func build(t testing.TB) *Model {

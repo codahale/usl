@@ -174,12 +174,12 @@ func parseLine(i, nCol, xCol int, line []string) (float64, float64, error) {
 
 	n, err := strconv.ParseFloat(line[nCol-1], 64)
 	if err != nil {
-		return 0, 0, fmt.Errorf("%v at line %d, column %d", err, i+1, nCol)
+		return 0, 0, fmt.Errorf("error at line %d, column %d: %w", i+1, nCol, err)
 	}
 
 	x, err := strconv.ParseFloat(line[xCol-1], 64)
 	if err != nil {
-		return 0, 0, fmt.Errorf("%v at line %d, column %d", err, i+1, xCol)
+		return 0, 0, fmt.Errorf("error at line %d, column %d: %w", i+1, xCol, err)
 	}
 
 	return n, x, nil
