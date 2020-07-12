@@ -3,16 +3,10 @@
 package usl
 
 import (
-	"errors"
 	"fmt"
 	"math"
 
 	"github.com/maorshutman/lm"
-)
-
-var (
-	// ErrInsufficientMeasurements is returned when fewer than 6 measurements were provided.
-	ErrInsufficientMeasurements = errors.New("usl: need at least 6 measurements")
 )
 
 // Model is a Universal Scalability Law model.
@@ -102,8 +96,6 @@ func (m *Model) Limitless() bool {
 	return m.Kappa == 0
 }
 
-const minMeasurements = 6
-
 // Build returns a model whose parameters are generated from the given measurements.
 //
 // Finds a set of coefficients for the equation y = λx/(1+σ(x-1)+κx(x-1)) which best fit the
@@ -160,3 +152,14 @@ func Build(measurements []Measurement) (m *Model, err error) {
 		Lambda: results.X[2],
 	}, nil
 }
+
+const (
+	// minMeasurement is the smallest number of measurements from which a useful model can be
+	// created.
+	minMeasurements = 6
+)
+
+var (
+	// ErrInsufficientMeasurements is returned when fewer than 6 measurements were provided.
+	ErrInsufficientMeasurements = fmt.Errorf("usl: need at least %d measurements", minMeasurements)
+)
