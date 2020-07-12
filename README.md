@@ -92,7 +92,7 @@ func main() {
 
 	model := usl.Build(measurements)
 	for n := 10; n < 200; n += 10 {
-		fmt.Printf("At %d workers, expect %f req/sec\n",
+		fmt.Printf("At %d concurrent clients, expect %f req/sec\n",
 			n, model.ThroughputAtConcurrency(float64(n)))
 	}
 }
