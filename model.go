@@ -26,15 +26,15 @@ func (m *Model) String() string {
 	return fmt.Sprintf("Model{σ=%v,κ=%v,λ=%v}", m.Sigma, m.Kappa, m.Lambda)
 }
 
-// ThroughputAtConcurrency returns the expected throughput given a number of concurrent workers,
-// Concurrency(N).
+// ThroughputAtConcurrency returns the expected throughput given a number of concurrent events,
+// X(N).
 //
 // See "Practical Scalability Analysis with the Universal Scalability Law, Equation 3".
 func (m *Model) ThroughputAtConcurrency(n float64) float64 {
 	return (m.Lambda * n) / (1 + (m.Sigma * (n - 1)) + (m.Kappa * n * (n - 1)))
 }
 
-// LatencyAtConcurrency returns the expected mean latency given a number of concurrent workers,
+// LatencyAtConcurrency returns the expected mean latency given a number of concurrent events,
 // R(N).
 //
 // See "Practical Scalability Analysis with the Universal Scalability Law, Equation 6".
@@ -42,7 +42,7 @@ func (m *Model) LatencyAtConcurrency(n float64) float64 {
 	return (1 + (m.Sigma * (n - 1)) + (m.Kappa * n * (n - 1))) / m.Lambda
 }
 
-// MaxConcurrency returns the maximum expected number of concurrent workers the system can handle,
+// MaxConcurrency returns the maximum expected number of concurrent events the system can handle,
 // Nmax.
 //
 // See "Practical Scalability Analysis with the Universal Scalability Law, Equation 4".
@@ -70,8 +70,8 @@ func (m *Model) ThroughputAtLatency(r float64) float64 {
 		2*m.Kappa*(2*m.Lambda*r+m.Sigma-2)) - m.Kappa + m.Sigma) / (2.0 * m.Kappa * r)
 }
 
-// ConcurrencyAtLatency returns the expected number of concurrent workers given a mean latency,
-// N(R).
+// ConcurrencyAtLatency returns the expected number of concurrent events at a particular mean
+// latency, N(R).
 //
 // See "Practical Scalability Analysis with the Universal Scalability Law, Equation 10".
 func (m *Model) ConcurrencyAtLatency(r float64) float64 {
@@ -81,7 +81,7 @@ func (m *Model) ConcurrencyAtLatency(r float64) float64 {
 			2*m.Kappa*((2*m.Lambda*r)+m.Sigma-2))) / (2 * m.Kappa)
 }
 
-// ConcurrencyAtThroughput returns the expected number of concurrent workers at a particular
+// ConcurrencyAtThroughput returns the expected number of concurrent events at a particular
 // throughput, N(X).
 func (m *Model) ConcurrencyAtThroughput(x float64) float64 {
 	return m.LatencyAtThroughput(x) * x
