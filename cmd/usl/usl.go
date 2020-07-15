@@ -56,8 +56,6 @@
 // USL will output the data in CSV format on STDOUT.
 //
 // For more information, see http://www.perfdynamics.com/Manifesto/USLscalability.html.
-
-//nolint:goerr113 // not a package
 package main
 
 import (
@@ -78,6 +76,7 @@ func main() {
 	}
 }
 
+//nolint:goerr113 // not a package
 func run() error {
 	input := flag.String("in", "", "input file")
 	nCol := flag.Int("n_col", 1, "column index of concurrency values")
@@ -175,6 +174,7 @@ func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurem
 	return measurements, nil
 }
 
+//nolint:goerr113 // not a package
 func parseLine(i, nCol, xCol int, line []string) (float64, float64, error) {
 	if len(line) != 2 {
 		return 0, 0, fmt.Errorf("invalid line at line %d", i+1)
