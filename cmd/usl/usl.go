@@ -168,6 +168,8 @@ func printModel(m *usl.Model, measurements []usl.Measurement, noGraph bool, widt
 		c.AddFunc("Predicted", m.ThroughputAtConcurrency,
 			chart.PlotStyleLines, chart.AutoStyle(6, false))
 		c.AddDataPair("Actual", x, y, chart.PlotStylePoints, chart.AutoStyle(5, false))
+		c.AddDataPair("Peak", []float64{m.MaxConcurrency()}, []float64{m.MaxThroughput()},
+			chart.PlotStylePoints, chart.AutoStyle(7, false))
 
 		txt := txtg.New(width, height)
 		c.Plot(txt)
