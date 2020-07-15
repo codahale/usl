@@ -56,13 +56,14 @@
 // USL will output the data in CSV format on STDOUT.
 //
 // For more information, see http://www.perfdynamics.com/Manifesto/USLscalability.html.
+
+//nolint:goerr113 // not a package
 package main
 
 import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
@@ -70,67 +71,75 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err)
+
+		os.Exit(-1)
+	}
+}
+
+func run() error {
 	input := flag.String("in", "", "input file")
 	nCol := flag.Int("n_col", 1, "column index of concurrency values")
 	rCol := flag.Int("r_col", 2, "column index of latency values")
 	skip := flag.Bool("skip_headers", false, "skip the first line")
 
-	log.SetFlags(0) // don't prefix the log statements
-	log.SetOutput(os.Stderr)
-
 	flag.Usage = func() {
-		fmt.Printf("Usage: usl <-in input.csv> [options] [points...]\n\n")
+		_, _ = fmt.Fprintf(os.Stderr, "Usage: usl <-in input.csv> [options] [points...]\n\n")
+
 		flag.PrintDefaults()
 	}
 	flag.Parse()
 
 	if len(*input) == 0 {
-		log.Fatal("No input files provided.")
+		return fmt.Errorf("no input files provided")
 	}
 
 	measurements, err := parseCSV(*input, *nCol, *rCol, *skip)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("error parsing %w", err)
 	}
 
 	m, err := usl.Build(measurements)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	printModel(m)
 
-	printPredictions(m)
+	return printPredictions(m)
 }
 
 func printModel(m *usl.Model) {
-	log.Printf("URL parameters: σ=%v, κ=%v, λ=%v\n", m.Sigma, m.Kappa, m.Lambda)
-	log.Printf("\tmax throughput: %v, max concurrency: %v\n", m.MaxThroughput(), m.MaxConcurrency())
+	_, _ = fmt.Fprintf(os.Stderr, "URL parameters: σ=%v, κ=%v, λ=%v\n", m.Sigma, m.Kappa, m.Lambda)
+	_, _ = fmt.Fprintf(os.Stderr, "\tmax throughput: %v, max concurrency: %v\n", m.MaxThroughput(), m.MaxConcurrency())
 
 	if m.ContentionConstrained() {
-		log.Println("\tcontention constrained")
+		_, _ = fmt.Fprintln(os.Stderr, "\tcontention constrained")
 	}
 
 	if m.CoherencyConstrained() {
-		log.Println("\tcoherence constrained")
+		_, _ = fmt.Fprintln(os.Stderr, "\tcoherence constrained")
 	}
 
 	if m.Limitless() {
-		log.Println("\tlimitless")
+		_, _ = fmt.Fprintln(os.Stderr, "\tlimitless")
 	}
 
-	log.Println()
+	_, _ = fmt.Fprintln(os.Stderr)
 }
 
-func printPredictions(m *usl.Model) {
+func printPredictions(m *usl.Model) error {
 	for _, s := range flag.Args() {
 		n, err := strconv.ParseFloat(s, 64)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		fmt.Printf("%f,%f\n", n, m.ThroughputAtConcurrency(n))
 	}
+
+	return nil
 }
 
 func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurement, error) {
@@ -166,7 +175,6 @@ func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurem
 	return measurements, nil
 }
 
-//nolint:goerr113 // not a package
 func parseLine(i, nCol, xCol int, line []string) (float64, float64, error) {
 	if len(line) != 2 {
 		return 0, 0, fmt.Errorf("invalid line at line %d", i+1)
