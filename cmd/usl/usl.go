@@ -22,24 +22,45 @@
 // After our load testing is done, we should have a CSV file which consists of a series of
 // (concurrency, throughput) pairs of measurements:
 //
-//      1,65
-//      18,996
-//      36,1652
-//      72,1853
-//      108,1829
-//      144,1775
-//      216,1702
+//     1,65
+//     18,996
+//     36,1652
+//     72,1853
+//     108,1829
+//     144,1775
+//     216,1702
 //
 // We can then run the USL binary:
 //
-//		usl -in data.csv
+//     usl -in data.csv
 //
 // USL parses the given CSV file as a series of (concurrency, throughput) points, calculates the USL
-// parameters using quadratic regression, and then prints out the details of the model:
+// parameters using quadratic regression, and then prints out the details of the model, along with a
+// graph of the model's predictions and the given measurements:
 //
-//     URL parameters: σ=0.02772985648395876, κ=0.00010434289088915312, λ=89.98778453648904
-//         max throughput: 1883.7622524836281, max concurrency: 96
-//         contention constrained
+//    URL parameters: σ=0.02772985648395876, κ=0.00010434289088915312, λ=89.98778453648904
+//            max throughput: 1883.7622524836281, max concurrency: 96
+//            contention constrained
+//
+//             |
+//      2.1 k  +
+//      2.0 k  +                   ***X**********X*********
+//      1.8 k  +              *****                        **X**********
+//      1.7 k  +          X **
+//      1.6 k  +          **
+//      1.5 k  +        **
+//      1.3 k  +       *
+//      1.2 k  +      *
+//      1.1 k  +    X*
+//        975  +     *
+//        853  +    *                                   .------------------.
+//        731  +   *                                    |****** Predicted  |
+//        609  +  *                                     |  X    Actual     |
+//        487  + *                                      '------------------'
+//        366  + *
+//        244  +*
+//       1122  X----+------+-----+-----+-----+------+-----+-----+-----+-----+-
+//                 19     38    58    77    96     115   134   154   173   192
 //
 // Among the details here we see two things worth noting. First, the system appears to be
 // constrained by contention, so optimization work should be focused mostly on removing locks, etc.
@@ -51,7 +72,7 @@
 // Finally, we can provide USL a series of additional data points to provide
 // estimates for:
 //
-//		usl -in data.csv 128 256 512
+//     usl -in data.csv 128 256 512
 //
 // USL will output the data in CSV format on STDOUT.
 //
@@ -66,6 +87,8 @@ import (
 	"strconv"
 
 	"github.com/codahale/usl"
+	"github.com/vdobler/chart"
+	"github.com/vdobler/chart/txtg"
 )
 
 func main() {
@@ -81,7 +104,10 @@ func run() error {
 	input := flag.String("in", "", "input file")
 	nCol := flag.Int("n_col", 1, "column index of concurrency values")
 	rCol := flag.Int("r_col", 2, "column index of latency values")
-	skip := flag.Bool("skip_headers", false, "skip the first line")
+	skipHeaders := flag.Bool("skip_headers", false, "skip the first line")
+	width := flag.Int("width", 74, "width of graph")
+	height := flag.Int("height", 20, "height of graph")
+	noGraph := flag.Bool("no_graph", false, "don't print the graph")
 
 	flag.Usage = func() {
 		_, _ = fmt.Fprintf(os.Stderr, "Usage: usl <-in input.csv> [options] [points...]\n\n")
@@ -94,7 +120,7 @@ func run() error {
 		return fmt.Errorf("no input files provided")
 	}
 
-	measurements, err := parseCSV(*input, *nCol, *rCol, *skip)
+	measurements, err := parseCSV(*input, *nCol, *rCol, *skipHeaders)
 	if err != nil {
 		return fmt.Errorf("error parsing %w", err)
 	}
@@ -104,12 +130,12 @@ func run() error {
 		return err
 	}
 
-	printModel(m)
+	printModel(m, measurements, *noGraph, *width, *height)
 
 	return printPredictions(m)
 }
 
-func printModel(m *usl.Model) {
+func printModel(m *usl.Model, measurements []usl.Measurement, noGraph bool, width int, height int) {
 	_, _ = fmt.Fprintf(os.Stderr, "URL parameters: σ=%v, κ=%v, λ=%v\n", m.Sigma, m.Kappa, m.Lambda)
 	_, _ = fmt.Fprintf(os.Stderr, "\tmax throughput: %v, max concurrency: %v\n", m.MaxThroughput(), m.MaxConcurrency())
 
@@ -123,6 +149,30 @@ func printModel(m *usl.Model) {
 
 	if m.Limitless() {
 		_, _ = fmt.Fprintln(os.Stderr, "\tlimitless")
+	}
+
+	if !noGraph {
+		x := make([]float64, len(measurements))
+		y := make([]float64, len(measurements))
+
+		for i, m := range measurements {
+			x[i] = m.Concurrency
+			y[i] = m.Throughput
+		}
+
+		c := chart.ScatterChart{}
+		c.Key.Pos = "ibr"
+		c.XRange.Fixed(1, m.MaxConcurrency()*2, (m.MaxConcurrency()*2)/10)
+		c.YRange.Fixed(0, m.MaxThroughput()*1.1, 0)
+		c.NSamples = len(measurements)
+		c.AddFunc("Predicted", m.ThroughputAtConcurrency,
+			chart.PlotStyleLines, chart.AutoStyle(6, false))
+		c.AddDataPair("Actual", x, y, chart.PlotStylePoints, chart.AutoStyle(5, false))
+
+		txt := txtg.New(width, height)
+		c.Plot(txt)
+
+		_, _ = fmt.Fprint(os.Stderr, txt)
 	}
 
 	_, _ = fmt.Fprintln(os.Stderr)
