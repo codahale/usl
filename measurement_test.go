@@ -2,6 +2,7 @@ package usl
 
 import (
 	"testing"
+	"time"
 
 	"github.com/codahale/usl/internal/assert"
 )
@@ -13,7 +14,7 @@ func TestMeasurement_String(t *testing.T) {
 }
 
 func TestConcurrencyAndLatency(t *testing.T) {
-	m := ConcurrencyAndLatency(3, 0.6)
+	m := ConcurrencyAndLatency(3, 600*time.Millisecond)
 
 	assert.Equal(t, "Concurrency", 3.0, m.Concurrency, epsilon)
 	assert.Equal(t, "Latency", 0.6, m.Latency, epsilon)
@@ -29,7 +30,7 @@ func TestConcurrencyAndThroughput(t *testing.T) {
 }
 
 func TestThroughputAndLatency(t *testing.T) {
-	m := ThroughputAndLatency(5, 0.6)
+	m := ThroughputAndLatency(5, 600*time.Millisecond)
 
 	assert.Equal(t, "Concurrency", 3.0, m.Concurrency, epsilon)
 	assert.Equal(t, "Latency", 0.6, m.Latency, epsilon)

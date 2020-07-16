@@ -196,12 +196,12 @@ func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurem
 }
 
 //nolint:goerr113 // not a package
-func parseLine(i, nCol, xCol int, line []string) (float64, float64, error) {
+func parseLine(i, nCol, xCol int, line []string) (uint64, float64, error) {
 	if len(line) != 2 {
 		return 0, 0, fmt.Errorf("invalid line at line %d", i+1)
 	}
 
-	n, err := strconv.ParseFloat(line[nCol-1], 64)
+	n, err := strconv.ParseUint(line[nCol-1], 10, 64)
 	if err != nil {
 		return 0, 0, fmt.Errorf("error at line %d, column %d: %w", i+1, nCol, err)
 	}
