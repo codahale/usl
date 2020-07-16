@@ -8,6 +8,8 @@ linters:
     - dogsled
     - dupl
     - errcheck
+    - exhaustive
+    - exportloopref
     - funlen
     - gochecknoglobals
     - gochecknoinits
@@ -33,10 +35,12 @@ linters:
     - misspell
     - nakedret
     - nestif
+    - noctx
     - nolintlint
     - prealloc
     - rowserrcheck
     - scopelint
+    - sqlclosecheck
     - staticcheck
     - structcheck
     - stylecheck
@@ -46,6 +50,8 @@ linters:
     - varcheck
     - whitespace
     - wsl
+#    - gofumpt
+#    - goheader
 #    - gomnd
 #    - testpackage
 #    - typecheck
