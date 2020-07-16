@@ -159,7 +159,5 @@ const (
 	minMeasurements = 6
 )
 
-var (
-	// ErrInsufficientMeasurements is returned when fewer than 6 measurements were provided.
-	ErrInsufficientMeasurements = fmt.Errorf("usl: need at least %d measurements", minMeasurements)
-)
+// ErrInsufficientMeasurements is returned when fewer than 6 measurements were provided.
+var ErrInsufficientMeasurements = fmt.Errorf("usl: need at least %d measurements", minMeasurements)

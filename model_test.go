@@ -7,10 +7,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-var (
-	//nolint:gochecknoglobals // fine in tests
-	epsilon = cmpopts.EquateApprox(0.00001, 0.00001)
-)
+//nolint:gochecknoglobals // fine in tests
+var epsilon = cmpopts.EquateApprox(0.00001, 0.00001)
 
 func TestModel_Kappa(t *testing.T) {
 	m := build(t)
