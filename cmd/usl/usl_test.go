@@ -52,7 +52,7 @@ func TestBadThroughput(t *testing.T) {
 }
 
 func TestMainRun(t *testing.T) {
-	stdout, stderr := fakeMain(t, "-in", "example.csv", "1", "2", "3")
+	stdout, stderr := fakeMain(t, "example.csv", "1", "2", "3")
 
 	assert.Equal(t, "stdout",
 		`1.000000,89.987785

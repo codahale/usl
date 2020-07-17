@@ -32,7 +32,7 @@
 //
 // We can then run the USL binary:
 //
-//     usl -in data.csv
+//     usl data.csv
 //
 // USL parses the given CSV file as a series of (concurrency, throughput) points, calculates the USL
 // parameters using quadratic regression, and then prints out the details of the model, along with a
@@ -41,7 +41,7 @@
 // Finally, we can provide USL a series of additional data points to provide
 // estimates for:
 //
-//     usl -in data.csv 128 256 512
+//     usl data.csv 128 256 512
 //
 // USL will output the data in CSV format on STDOUT.
 //
@@ -70,7 +70,6 @@ func main() {
 
 //nolint:goerr113 // not a package
 func run() error {
-	input := flag.String("in", "", "input file")
 	nCol := flag.Int("n_col", 1, "column index of concurrency values")
 	rCol := flag.Int("r_col", 2, "column index of latency values")
 	skipHeaders := flag.Bool("skip_headers", false, "skip the first line")
@@ -79,17 +78,18 @@ func run() error {
 	noGraph := flag.Bool("no_graph", false, "don't print the graph")
 
 	flag.Usage = func() {
-		_, _ = fmt.Fprintf(os.Stderr, "Usage: usl <-in input.csv> [options] [points...]\n\n")
+		_, _ = fmt.Fprintf(os.Stderr, "Usage: usl <input.csv> [options] [points...]\n\n")
 
 		flag.PrintDefaults()
 	}
 	flag.Parse()
 
-	if len(*input) == 0 {
-		return fmt.Errorf("no input files provided")
+	if len(flag.Args()) == 0 {
+		flag.Usage()
+		return fmt.Errorf("no input file provided")
 	}
 
-	measurements, err := parseCSV(*input, *nCol, *rCol, *skipHeaders)
+	measurements, err := parseCSV(flag.Arg(0), *nCol, *rCol, *skipHeaders)
 	if err != nil {
 		return fmt.Errorf("error parsing %w", err)
 	}
@@ -101,7 +101,7 @@ func run() error {
 
 	printModel(m, measurements, *noGraph, *width, *height)
 
-	return printPredictions(m)
+	return printPredictions(m, flag.Args()[1:])
 }
 
 func printModel(m *usl.Model, measurements []usl.Measurement, noGraph bool, width, height int) {
@@ -149,8 +149,8 @@ func printModel(m *usl.Model, measurements []usl.Measurement, noGraph bool, widt
 	_, _ = fmt.Fprintln(os.Stderr)
 }
 
-func printPredictions(m *usl.Model) error {
-	for _, s := range flag.Args() {
+func printPredictions(m *usl.Model, args []string) error {
+	for _, s := range args {
 		n, err := strconv.ParseFloat(s, 64)
 		if err != nil {
 			return err
