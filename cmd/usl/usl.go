@@ -76,6 +76,7 @@ func run() error {
 	width := flag.Int("width", 74, "width of graph")
 	height := flag.Int("height", 20, "height of graph")
 	noGraph := flag.Bool("no_graph", false, "don't print the graph")
+	v := flag.Bool("version", false, "display the version number")
 
 	flag.Usage = func() {
 		_, _ = fmt.Fprintf(os.Stderr, "Usage: usl <input.csv> [options] [points...]\n\n")
@@ -83,6 +84,11 @@ func run() error {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+
+	if *v {
+		fmt.Println(version)
+		return nil
+	}
 
 	if len(flag.Args()) == 0 {
 		flag.Usage()
@@ -213,3 +219,5 @@ func parseLine(i, nCol, xCol int, line []string) (uint64, float64, error) {
 
 	return n, x, nil
 }
+
+var version = "dev"
