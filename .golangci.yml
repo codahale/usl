@@ -11,6 +11,7 @@ linters:
     - exhaustive
     - exportloopref
     - funlen
+    - gci
     - gochecknoglobals
     - gochecknoinits
     - gocognit
@@ -53,6 +54,7 @@ linters:
     - wsl
 #    - goheader
 #    - gomnd
+#    - nlreturn
 #    - testpackage
 #    - typecheck
 
