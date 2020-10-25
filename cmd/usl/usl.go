@@ -68,7 +68,7 @@ func main() {
 	}
 }
 
-//nolint:goerr113,wrapcheck // not a package
+//nolint:goerr113 // not a package
 func run() error {
 	nCol := flag.Int("n_col", 1, "column index of concurrency values")
 	rCol := flag.Int("r_col", 2, "column index of latency values")
@@ -155,7 +155,6 @@ func printModel(m *usl.Model, measurements []usl.Measurement, noGraph bool, widt
 	_, _ = fmt.Fprintln(os.Stderr)
 }
 
-//nolint:wrapcheck // not a package
 func printPredictions(m *usl.Model, args []string) error {
 	for _, s := range args {
 		n, err := strconv.ParseFloat(s, 64)
@@ -169,7 +168,6 @@ func printPredictions(m *usl.Model, args []string) error {
 	return nil
 }
 
-//nolint:wrapcheck // not a package
 func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurement, error) {
 	measurements := make([]usl.Measurement, 0, 100)
 
