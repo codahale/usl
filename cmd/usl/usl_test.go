@@ -62,8 +62,8 @@ func TestMainRun(t *testing.T) {
 		string(stdout))
 
 	assert.Equal(t, "stderr",
-		`URL parameters: σ=0.02772985648395876, κ=0.00010434289088915312, λ=89.98778453648904
-	max throughput: 1883.7622524836281, max concurrency: 96
+		`USL parameters: σ=0.0277299, κ=0.000104343, λ=89.9878
+	max throughput: 1883.76, max concurrency: 96
 	contention constrained
                                                                           
         |                                                                 

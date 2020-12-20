@@ -111,8 +111,8 @@ func run() error {
 }
 
 func printModel(m *usl.Model, measurements []usl.Measurement, noGraph bool, width, height int) {
-	_, _ = fmt.Fprintf(os.Stderr, "URL parameters: σ=%v, κ=%v, λ=%v\n", m.Sigma, m.Kappa, m.Lambda)
-	_, _ = fmt.Fprintf(os.Stderr, "\tmax throughput: %v, max concurrency: %v\n", m.MaxThroughput(), m.MaxConcurrency())
+	_, _ = fmt.Fprintf(os.Stderr, "USL parameters: σ=%.6g, κ=%.6g, λ=%.6g\n", m.Sigma, m.Kappa, m.Lambda)
+	_, _ = fmt.Fprintf(os.Stderr, "\tmax throughput: %.6g, max concurrency: %.6g\n", m.MaxThroughput(), m.MaxConcurrency())
 
 	if m.ContentionConstrained() {
 		_, _ = fmt.Fprintln(os.Stderr, "\tcontention constrained")
