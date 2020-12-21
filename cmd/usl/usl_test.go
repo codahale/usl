@@ -11,6 +11,8 @@ import (
 )
 
 func TestParsing(t *testing.T) {
+	t.Parallel()
+
 	want := []usl.Measurement{
 		usl.ConcurrencyAndThroughput(1, 65),
 		usl.ConcurrencyAndThroughput(18, 996),
@@ -31,6 +33,8 @@ func TestParsing(t *testing.T) {
 }
 
 func TestBadLine(t *testing.T) {
+	t.Parallel()
+
 	_, _, err := parseLine(0, 1, 2, []string{"funk"})
 	if err == nil {
 		t.Fatalf("should have failed")
@@ -38,6 +42,8 @@ func TestBadLine(t *testing.T) {
 }
 
 func TestBadConcurrency(t *testing.T) {
+	t.Parallel()
+
 	_, _, err := parseLine(0, 1, 2, []string{"f", "1"})
 	if err == nil {
 		t.Fatalf("should have failed")
@@ -45,6 +51,8 @@ func TestBadConcurrency(t *testing.T) {
 }
 
 func TestBadThroughput(t *testing.T) {
+	t.Parallel()
+
 	_, _, err := parseLine(0, 1, 2, []string{"1", "f"})
 	if err == nil {
 		t.Fatalf("should have failed")
@@ -52,6 +60,8 @@ func TestBadThroughput(t *testing.T) {
 }
 
 func TestMainRun(t *testing.T) {
+	t.Parallel()
+
 	stdout, stderr := fakeMain(t, "example.csv", "1", "2", "3")
 
 	assert.Equal(t, "stdout",

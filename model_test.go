@@ -11,48 +11,64 @@ import (
 var epsilon = cmpopts.EquateApprox(0.00001, 0.00001)
 
 func TestModel_Kappa(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "Kappa", 7.690945e-4, m.Kappa, epsilon)
 }
 
 func TestModel_Sigma(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "Sigma", 0.02671591, m.Sigma, epsilon)
 }
 
 func TestModel_Lambda(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "Lambda", 995.6486, m.Lambda, epsilon)
 }
 
 func TestModel_MaxConcurrency(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "MaxConcurrency", 35.0, m.MaxConcurrency(), epsilon)
 }
 
 func TestModel_MaxThroughput(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "MaxThroughput", 12341.745415132369, m.MaxThroughput(), epsilon)
 }
 
 func TestModel_CoherencyConstrained(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "CoherencyConstrained", false, m.CoherencyConstrained())
 }
 
 func TestModel_ContentionConstrained(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "ContentionConstrained", true, m.ContentionConstrained())
 }
 
 func TestModel_LatencyAtConcurrency(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "R(N=1)", 0.0010043702853760425, m.LatencyAtConcurrency(1), epsilon)
@@ -61,6 +77,8 @@ func TestModel_LatencyAtConcurrency(t *testing.T) {
 }
 
 func TestModel_ThroughputAtConcurrency(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "X(N=1)", 995.648772003358, m.ThroughputAtConcurrency(1), epsilon)
@@ -69,6 +87,8 @@ func TestModel_ThroughputAtConcurrency(t *testing.T) {
 }
 
 func TestModel_ConcurrencyAtThroughput(t *testing.T) {
+	t.Parallel()
+
 	m := build(t)
 
 	assert.Equal(t, "N(X=955)", 0.9580998829620233, m.ConcurrencyAtThroughput(955), epsilon)
@@ -77,6 +97,8 @@ func TestModel_ConcurrencyAtThroughput(t *testing.T) {
 }
 
 func TestModel_ThroughputAtLatency(t *testing.T) {
+	t.Parallel()
+
 	m := &Model{Sigma: 0.06, Kappa: 0.06, Lambda: 40}
 
 	assert.Equal(t, "X(R=0.03)", 69.38886664887109, m.ThroughputAtLatency(0.03), epsilon)
@@ -85,6 +107,8 @@ func TestModel_ThroughputAtLatency(t *testing.T) {
 }
 
 func TestModel_LatencyAtThroughput(t *testing.T) {
+	t.Parallel()
+
 	m := &Model{Sigma: 0.06, Kappa: 0.06, Lambda: 40}
 
 	assert.Equal(t, "R(N=400)", 0.05875, m.LatencyAtThroughput(400), epsilon)
@@ -93,6 +117,8 @@ func TestModel_LatencyAtThroughput(t *testing.T) {
 }
 
 func TestModel_ConcurrencyAtLatency(t *testing.T) {
+	t.Parallel()
+
 	m, err := Build(measurements[:10])
 	if err != nil {
 		t.Fatal(err)
@@ -104,6 +130,8 @@ func TestModel_ConcurrencyAtLatency(t *testing.T) {
 }
 
 func TestModel_Limitless(t *testing.T) {
+	t.Parallel()
+
 	m := &Model{Sigma: 1, Kappa: 0, Lambda: 40}
 
 	assert.Equal(t, "Limitless", true, m.Limitless())
@@ -114,6 +142,8 @@ func TestModel_Limitless(t *testing.T) {
 }
 
 func TestModel_String(t *testing.T) {
+	t.Parallel()
+
 	m := &Model{Sigma: 1, Kappa: 2, Lambda: 3}
 
 	assert.Equal(t, "String", "Model{σ=1,κ=2,λ=3}", m.String())
