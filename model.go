@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/maorshutman/lm"
+	"gonum.org/v1/gonum/floats"
 )
 
 // Model is a Universal Scalability Law model.
@@ -106,16 +107,14 @@ func Build(measurements []Measurement) (m *Model, err error) {
 		return nil, ErrInsufficientMeasurements
 	}
 
-	// Calculate an initial guess at the model parameters.
-	init := []float64{0.1, 0.01, 0}
-
-	// Use max(x/n) as initial lambda.
-	for _, m := range measurements {
-		v := m.Throughput / m.Concurrency
-		if v > init[2] {
-			init[2] = v
-		}
+	// Calculate x/n for all measurements.
+	xn := make([]float64, len(measurements))
+	for i, m := range measurements {
+		xn[i] = m.Throughput / m.Concurrency
 	}
+
+	// Calculate an initial guess at the model parameters.
+	init := []float64{0.1, 0.01, floats.Max(xn)}
 
 	// Calculate the residuals of a possible model.
 	f := func(dst, x []float64) {
