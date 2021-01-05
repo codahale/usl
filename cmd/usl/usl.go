@@ -68,7 +68,8 @@ func main() {
 	}
 }
 
-//nolint:goerr113 // not a package
+var errNoInputFile = fmt.Errorf("no input file provided")
+
 func run() error {
 	nCol := flag.Int("n_col", 1, "column index of concurrency values")
 	rCol := flag.Int("r_col", 2, "column index of latency values")
@@ -92,12 +93,14 @@ func run() error {
 
 	if len(flag.Args()) == 0 {
 		flag.Usage()
-		return fmt.Errorf("no input file provided")
+		return errNoInputFile
 	}
 
-	measurements, err := parseCSV(flag.Arg(0), *nCol, *rCol, *skipHeaders)
+	path := flag.Arg(0)
+
+	measurements, err := parseCSV(path, *nCol, *rCol, *skipHeaders)
 	if err != nil {
-		return fmt.Errorf("error parsing %w", err)
+		return fmt.Errorf("error parsing %q: %w", path, err)
 	}
 
 	m, err := usl.Build(measurements)
