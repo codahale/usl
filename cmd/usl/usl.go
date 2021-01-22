@@ -50,11 +50,11 @@ package main
 
 import (
 	"encoding/csv"
-	"flag"
 	"fmt"
 	"os"
 	"strconv"
 
+	"github.com/alecthomas/kong"
 	"github.com/codahale/usl"
 	"github.com/vdobler/chart"
 	"github.com/vdobler/chart/txtg"
@@ -68,39 +68,29 @@ func main() {
 	}
 }
 
-var errNoInputFile = fmt.Errorf("no input file provided")
-
 func run() error {
-	nCol := flag.Int("n_col", 1, "column index of concurrency values")
-	rCol := flag.Int("r_col", 2, "column index of latency values")
-	skipHeaders := flag.Bool("skip_headers", false, "skip the first line")
-	width := flag.Int("width", 74, "width of graph")
-	height := flag.Int("height", 20, "height of graph")
-	noGraph := flag.Bool("no_graph", false, "don't print the graph")
-	v := flag.Bool("version", false, "display the version number")
-
-	flag.Usage = func() {
-		_, _ = fmt.Fprintf(os.Stderr, "Usage: usl <input.csv> [options] [points...]\n\n")
-
-		flag.PrintDefaults()
-	}
-	flag.Parse()
-
-	if *v {
-		fmt.Println(version)
-		return nil
+	//nolint:maligned // ordering of fields matters
+	var cli struct {
+		InputPath         string           `arg:"" type:"existingfile" help:"The CSV file measurements of the system."`
+		Predictions       []float64        `arg:"" optional:"" help:"Predict throughput at the given concurrency levels."`
+		ConcurrencyColumn int              `short:"N" default:"1" help:"The column index of concurrency values."`
+		LatencyColumn     int              `short:"R" default:"2" help:"The column index of latency values."`
+		SkipHeaders       bool             `default:"false" help:"Skip the first line of the file."`
+		Width             int              `short:"W" default:"74" help:"The width of the graph in chars."`
+		Height            int              `short:"H" default:"20" help:"The height of the graph in chars."`
+		NoGraph           bool             `default:"false" help:"Don't display the graph.'"`
+		Version           kong.VersionFlag `help:"Display the application version."`
 	}
 
-	if len(flag.Args()) == 0 {
-		flag.Usage()
-		return errNoInputFile
+	ctx := kong.Parse(&cli, kong.Vars{"version": version})
+	if ctx.Error != nil {
+		_, _ = fmt.Fprintln(os.Stderr, ctx.Error)
+		os.Exit(1)
 	}
 
-	path := flag.Arg(0)
-
-	measurements, err := parseCSV(path, *nCol, *rCol, *skipHeaders)
+	measurements, err := parseCSV(cli.InputPath, cli.ConcurrencyColumn, cli.LatencyColumn, cli.SkipHeaders)
 	if err != nil {
-		return fmt.Errorf("error parsing %q: %w", path, err)
+		return fmt.Errorf("error parsing %q: %w", cli.InputPath, err)
 	}
 
 	m, err := usl.Build(measurements)
@@ -108,9 +98,11 @@ func run() error {
 		return err
 	}
 
-	printModel(m, measurements, *noGraph, *width, *height)
+	printModel(m, measurements, cli.NoGraph, cli.Width, cli.Height)
 
-	return printPredictions(m, flag.Args()[1:])
+	printPredictions(m, cli.Predictions)
+
+	return nil
 }
 
 func printModel(m *usl.Model, measurements []usl.Measurement, noGraph bool, width, height int) {
@@ -158,17 +150,10 @@ func printModel(m *usl.Model, measurements []usl.Measurement, noGraph bool, widt
 	_, _ = fmt.Fprintln(os.Stderr)
 }
 
-func printPredictions(m *usl.Model, args []string) error {
-	for _, s := range args {
-		n, err := strconv.ParseFloat(s, 64)
-		if err != nil {
-			return err
-		}
-
+func printPredictions(m *usl.Model, args []float64) {
+	for _, n := range args {
 		fmt.Printf("%f,%f\n", n, m.ThroughputAtConcurrency(n))
 	}
-
-	return nil
 }
 
 func parseCSV(filename string, nCol, rCol int, skipHeaders bool) ([]usl.Measurement, error) {
