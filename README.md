@@ -139,7 +139,7 @@ I also [wrote a blog post about my Java implementation of USL][usl4j].
 
 ## License
 
-Copyright © 2020 Coda Hale
+Copyright © 2021 Coda Hale
 
 Distributed under the Apache License 2.0.
 
