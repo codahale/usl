@@ -101,6 +101,8 @@ func TestMainRun(t *testing.T) {
 }
 
 func fakeMain(t *testing.T, args ...string) ([]byte, []byte) {
+	t.Helper()
+
 	stdout, err := ioutil.TempFile(os.TempDir(), "stdout")
 	if err != nil {
 		t.Fatal(err)
