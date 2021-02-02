@@ -8,7 +8,7 @@ import (
 )
 
 //nolint:gochecknoglobals // fine in tests
-var epsilon = cmpopts.EquateApprox(0.00001, 0.00001)
+var epsilon = cmpopts.EquateApprox(0.00001, 0)
 
 func TestModel_Kappa(t *testing.T) {
 	t.Parallel()

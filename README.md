@@ -12,7 +12,7 @@ concurrency and throughput, the [USL][USL] will allow you to predict what a syst
 will look like at a particular throughput, or how many servers you'll need to process requests and
 stay under your SLA's latency requirements.
 
-The model coefficients and predictions should be within 0.02% of those listed in the book.
+The model coefficients and predictions should be within 0.001% of those listed in the book.
 
 ## How to use this
 
