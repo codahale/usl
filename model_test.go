@@ -191,10 +191,12 @@ var measurements = []Measurement{
 	ConcurrencyAndThroughput(32, 12074.39),
 }
 
-func build(t testing.TB) *Model {
+func build(tb testing.TB) *Model {
+	tb.Helper()
+
 	m, err := Build(measurements)
 	if err != nil {
-		t.Fatal(err)
+		tb.Fatal(err)
 	}
 
 	return m
