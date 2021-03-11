@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/codahale/gubbins/assert"
 	"github.com/codahale/usl"
-	"github.com/codahale/usl/internal/assert"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 

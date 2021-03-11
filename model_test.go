@@ -3,7 +3,7 @@ package usl
 import (
 	"testing"
 
-	"github.com/codahale/usl/internal/assert"
+	"github.com/codahale/gubbins/assert"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 

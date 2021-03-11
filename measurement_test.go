@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/codahale/usl/internal/assert"
+	"github.com/codahale/gubbins/assert"
 )
 
 func TestMeasurement_String(t *testing.T) {
